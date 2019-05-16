@@ -632,7 +632,7 @@ class Location:
         """
         return ExecuteQuery().Query(self.urlCountry,'GET')
 
-    def getContry(self,countryId):
+    def getCountry(self,countryId):
         """Get country by id.
         Args:
             countryId       (str): Country id
