@@ -12,4 +12,6 @@ venv/
 # PyCharm
 .idea
 
-app/static/uploads/*
+app/static/uploads/
+
+.vscode/
