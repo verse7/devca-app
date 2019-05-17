@@ -8,13 +8,16 @@ Vue.component('app-header', {
       <div class="collapse navbar-collapse d-sm-none d-md-block">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item active">
-            <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
+            <router-link class="nav-link" to="/">Home<span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/register">Register</router-link>
+            <router-link class="nav-link" to="/explore">Explore</router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/login">Login</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/register">Register</router-link>
           </li>
         </ul>
       </div>
@@ -32,8 +35,8 @@ Vue.component('app-footer', {
           </router-link>
         </li>
         <li>
-          <router-link to="/events/create">
-            <ion-icon class="text-dark tab-icon" name="add"></ion-icon>
+          <router-link to="/explore">
+            <ion-icon class="text-dark tab-icon" name="map"></ion-icon>
           </router-link>
         </li>
         <li>
@@ -106,16 +109,18 @@ Vue.component('resource-listing', {
 
 const Home = Vue.component('home', {
     template: `
-    <div>
+    <div class="container">
       <header-mast></header-mast>
-      <resource-listing></resource-listing>
+      <resource-listing type="hotels"></resource-listing>
+      <resource-listing type="attractions"></resource-listing>
+      <resource-listing type=""></resource-listing>
     </div>
     `
 });
 
 const Register = Vue.component('register', {
   template: `
-  <div>
+  <div class="container">
     <h4 class="font-weight-bold">Registration</h4>
     <form id="registerForm" method="post" @submit.prevent="register" enctype="multipart\form-data">
       <div class="form-group">
@@ -173,7 +178,7 @@ const Register = Vue.component('register', {
 
 const Login = Vue.component('login', {
   template: `
-  <div>
+  <div class="container">
     <h4 class="font-weight-bold">Login</h4>
     <form id="loginForm" method="post" @submit.prevent="login">
       <div class="form-group">
@@ -226,6 +231,37 @@ const Login = Vue.component('login', {
   }
 });
 
+Vue.component('leaflet-map', {
+  template: `
+  <div id="map" class="widget">
+  </div>
+  `,
+  props: ['lat', 'lng', 'zoom'],
+  data: function() {
+    return {
+      accessToken: 'pk.eyJ1IjoiemRtd2kiLCJhIjoiY2l6a3EyOW1wMDAzbjJ3cHB2aHQ5a2N1eCJ9.xOIXUuzA4pJt7cLIR-wUSg'
+    }
+  },
+  mounted: function() {
+    const map = L.map('map', {
+      zoomControl: false
+    }).setView([this.lat, this.lng], this.zoom);
+
+    L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y}?access_token='+ this.accessToken, {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18,
+        id: 'mapbox.streets',
+        accessToken: this.accessToken
+    }).addTo(map);
+  }
+})
+
+const Explore = Vue.component('explore', {
+  template: `
+    <leaflet-map lat='18.25' lng='-77.5' zoom='8'></leaflet-map>
+  `
+});
+
 const NotFound = Vue.component('not-found', {
     template: `
     <div>
@@ -235,7 +271,7 @@ const NotFound = Vue.component('not-found', {
     data: function () {
         return {}
     }
-})
+});
 
 const router = new VueRouter({
     mode: 'history',
@@ -243,6 +279,7 @@ const router = new VueRouter({
         {path: "/", name: "home", component: Home, props: true},
         {path: "/login", name: "login", component: Login, props: true},
         {path: "/register", name: "register", component: Register, props: true},
+        {path: "/explore", name: "explore", component: Explore, props: true},
         // This is a catch all route in case none of the above matches
         {path: "*", component: NotFound}
     ]
