@@ -107,7 +107,7 @@ Vue.component('resource-listing', {
 const Home = Vue.component('home', {
     template: `
     <div>
-      <header-mast></header-mast>
+      <search></search>
       <resource-listing></resource-listing>
     </div>
     `
@@ -224,6 +224,44 @@ const Login = Vue.component('login', {
       })
     }
   }
+});
+
+const Search = Vue.component('search', {
+  template: `
+  <div>
+    <div class="mt-5">
+      <p class="font-weight-bold">Search Details Below</p>
+      <h4 class="font-weight-bold">Book Your Next Adventure</h4>
+      <form class="row pl-3">
+          <div class="form-group pr-2">
+            <label>Country</label>
+            <input type="text" name="country" class="form-control" placeholder="Enter Country">
+          </div>
+          <div class="form-group pr-2">
+            <label>City</label>
+            <input type="text" name="city" class="form-control" placeholder="Enter City">
+          </div>
+          <div class="form-group pr-2">
+            <label>Start Date</label>
+            <input type="date" name="startDate" class="form-control"placeholder="Start Date">
+          </div>
+          <div class="form-group pr-2">
+            <label>End Date</label>
+            <input type="date" name="endDate" class="form-control"placeholder="End Date">
+          </div>
+          <div class="form-group d-flex align-items-end">
+            <input type="submit" value="Submit" class="btn btn-primary font-weight-bold">
+          </div>
+      </form>
+    </div>
+  </div>
+	`,
+	methods: {
+		submit: function() {
+			let form = document.querySelector('form');
+			formData = new FormData(form);
+		}
+	}
 });
 
 const NotFound = Vue.component('not-found', {
