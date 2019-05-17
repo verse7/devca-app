@@ -1,8 +1,19 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField, SelectField, TextAreaField
+from wtforms import StringField, SelectField, TextAreaField, PasswordField, EmailField
 from wtforms.validators import InputRequired
 
+
+class LoginForm(FlaskForm):
+    emaill = EmailField('email', validators=[InputRequired()])
+    password = PasswordField('password', validators=[InputRequired()])
+
+class RegistrationForm(FlaskForm):
+    firstname = StringField('Firstname', validators=[InputRequired()])
+    lastname = StringField('Lastname', validators=[InputRequired()])
+    email = EmailField('Email', validators=[InputRequired()])
+    password = PasswordField('Password', validators=[InputRequired()])
+    photo = FileField('Photo', validators=[FileRequired(), FileAllowed(['png', 'jpg', 'jpeg'], 'Images Only!')])
 
 class GenericForm(FlaskForm):
     field1 = StringField('field1', validators=[InputRequired()])
