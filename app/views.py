@@ -56,7 +56,7 @@ def form_errors(form):
 ###
 # API endpoints
 ###
-@app.route('api/register', methods=['POST'])
+@app.route('/api/register', methods=['POST'])
 def register():
   form = RegistrationForm()
   if form.validate_on_submit() == True:
@@ -81,7 +81,7 @@ def register():
 
   return jsonify(error="Error: Invalid/Missing user information"), 401
 
-@app.route('api/auth/login', methods=['POST'])
+@app.route('/api/auth/login', methods=['POST'])
 def login():
   form = LoginForm()
   if form.validate_on_submit() == True:

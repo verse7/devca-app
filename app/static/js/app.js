@@ -68,7 +68,7 @@ const Register = Vue.component('register', {
       let registerForm = document.getElementById('registerForm');
       let registerInfo = new FormData(registerForm);
 
-      fetch("api/register", {
+      fetch("/api/register", {
         method: 'POST',
         body: registerInfo,
         headers: {
@@ -80,7 +80,9 @@ const Register = Vue.component('register', {
         return response.json();
       })
       .then(function (jsonResponse) {
-        console.log(jsonResponse);
+        if(jsonResponse.hasOwnProperty('message')){
+          router.push('/login');
+        }
       })
       .catch(function (error) {
         console.log(error);
@@ -113,7 +115,7 @@ const Login = Vue.component('login', {
       let loginInfo = new FormData(loginForm);
 
 
-      fetch("api/auth/login", {
+      fetch("/api/auth/login", {
         method: 'Post',
         body: loginInfo,
         headers: {
@@ -126,6 +128,16 @@ const Login = Vue.component('login', {
       })
       .then(function (jsonResponse){
         console.log(jsonResponse);
+        if(jsonResponse.hasOwnProperty('message')){
+          let jwt_token = jsonResponse.token;
+          let id = jsonResponse.user_id;
+
+          /*Stores the jwt locally to be accessed later*/
+          localStorage.setItem('token', jwt_token);
+          localStorage.setItem('current_user', id);
+
+          router.push('/');
+        }
       })
       .catch(function (error){
         console.log(error);
