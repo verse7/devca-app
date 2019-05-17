@@ -232,7 +232,7 @@ const Search = Vue.component('search', {
     <div class="mt-5">
       <p class="font-weight-bold">Search Details Below</p>
       <h4 class="font-weight-bold">Book Your Next Adventure</h4>
-      <form class="row pl-3">
+      <form class="row pl-3" @submit.prevent="search" method="post">
           <div class="form-group pr-2">
             <label>Country</label>
             <input type="text" name="country" class="form-control" placeholder="Enter Country">
@@ -243,11 +243,11 @@ const Search = Vue.component('search', {
           </div>
           <div class="form-group pr-2">
             <label>Start Date</label>
-            <input type="date" name="startDate" class="form-control"placeholder="Start Date">
+            <input type="date" id="startDate" name="startDate" class="form-control"placeholder="Start Date">
           </div>
           <div class="form-group pr-2">
             <label>End Date</label>
-            <input type="date" name="endDate" class="form-control"placeholder="End Date">
+            <input type="date" id="endDate" name="endDate" class="form-control"placeholder="End Date">
           </div>
           <div class="form-group d-flex align-items-end">
             <input type="submit" value="Submit" class="btn btn-primary font-weight-bold">
@@ -257,9 +257,33 @@ const Search = Vue.component('search', {
   </div>
 	`,
 	methods: {
-		submit: function() {
+		search: function() {
 			let form = document.querySelector('form');
+			let startDate =document.getElementById("startDate");
+			let endDate =document.getElementById("endDate");
 			formData = new FormData(form);
+			let s = new Date(startDate.value).toISOString();
+			let e = new Date(endDate.value).toISOString();
+      formData.set("startDate", s);
+			formData.set("endDate", e);
+      
+      fetch('/api/bookables', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': token,
+        },
+        credentials: 'same-origin'
+      })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (jsonResponse) {
+        console.log(jsonResponse);
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
 		}
 	}
 });
