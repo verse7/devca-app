@@ -1212,7 +1212,7 @@ class Media:
     def __init__(self):
         self.mediaURL = 'api.opencaribbean.org/api/v1/media/'    
     
-    def getMediaFile(filename):
+    def getMediaFile(self, filename):
         url = self.mediaURL + 'download/' + filename
         return ExecuteQuery().Query(url,'GET')
 

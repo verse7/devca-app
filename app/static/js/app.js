@@ -2,7 +2,7 @@ Vue.config.ignoredElements = ['ion-icon'];
 
 Vue.component('app-header', {
     template: `
-    <nav class="navbar navbar-expand-md navbar-light bg-transparent mb-2">
+    <nav class="navbar navbar-expand-md navbar-light bg-transparent fixed-top">
       <router-link class="navbar-brand title-font" to="/">DevCa</router-link>
     
       <div class="collapse navbar-collapse d-sm-none d-md-block">
@@ -51,20 +51,6 @@ Vue.component('app-footer', {
     `
 });
 
-Vue.component('header-mast', {
-  template: `
-  <div class="jumbotron jumbotron-fluid">
-    <div class="container d-flex flex-column justify-content-center align-items-center">
-      <h1>Lorem Ipsum</h1>
-      <div class="d-flex flex-row justify-content-center align-items-center">
-        <input type="text" class="form-control">
-        <button class="btn btn-primary">Search</button>
-      </div>
-    </div>
-  </div>
-  `
-});
-
 Vue.component('resource-card', {
   template: `
   <div class="card mr-2 bg-transparent text-dark">
@@ -106,7 +92,7 @@ Vue.component('resource-listing', {
 
 const Home = Vue.component('home', {
     template: `
-    <div>
+    <div class="bg-pattern">
       <search></search>
       <resource-listing></resource-listing>
     </div>
@@ -229,9 +215,9 @@ const Login = Vue.component('login', {
 const Search = Vue.component('search', {
   template: `
   <div>
-    <div class="mt-5">
+    <div class="search-form">
       <p class="font-weight-bold">Search Details Below</p>
-      <h4 class="font-weight-bold">Book Your Next Adventure</h4>
+      <h4 class="font-weight-bold mb-4">Book Your Next Adventure</h4>
       <form class="row pl-3">
           <div class="form-group pr-2">
             <label>Country</label>
