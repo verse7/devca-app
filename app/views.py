@@ -1,5 +1,7 @@
 import os
 import jwt
+import csv
+import sys
 from functools import wraps
 from flask import render_template, request, jsonify
 from app import app, db, csrf
@@ -103,6 +105,21 @@ def login():
   
   return jsonify(error="Failed to login user"), 401
 
+@app.route('/api/auth/events', methods=['GET'])
+def eventsDisplay():
+  #open csv file and read csv contents
+  with open('./app/static/assets/treasure-beach-entity_data.csv', encoding="utf8", errors='ignore') as csvfile:
+    reader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
+    header = next(reader)
+    
+    # rowNum = 0
+    # events = []
+    # e = {}
+    for row in reader:
+      print(row)
+      print()
+  csvfile.close()
+  return jsonify(events=events)
 
 ###
 # This route yields control to vue

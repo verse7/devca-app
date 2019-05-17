@@ -16,6 +16,9 @@ Vue.component('app-header', {
           <li class="nav-item">
             <router-link class="nav-link" to="/login">Login</router-link>
           </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/events">Events</router-link>
+          </li>
         </ul>
       </div>
     </nav>
@@ -226,6 +229,33 @@ const Login = Vue.component('login', {
   }
 });
 
+const Events = Vue.component('events', {
+  template: `
+  <div>
+  </div>
+  `,
+  created: function() {
+    let self = this;
+
+    fetch('/api/auth/events', {
+      method: 'GET',
+      headers: {
+        'X-CSRFToken': token
+      },
+      credentials: 'same-origin'
+    })
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (jsonResponse) {
+      console.log(jsonResponse);
+    })
+    .catch(function (error) {
+      console.log(error);
+    })
+  }
+});
+
 const NotFound = Vue.component('not-found', {
     template: `
     <div>
@@ -243,6 +273,7 @@ const router = new VueRouter({
         {path: "/", name: "home", component: Home, props: true},
         {path: "/login", name: "login", component: Login, props: true},
         {path: "/register", name: "register", component: Register, props: true},
+        {path: "/events", component: Events},
         // This is a catch all route in case none of the above matches
         {path: "*", component: NotFound}
     ]
