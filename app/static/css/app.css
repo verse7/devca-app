@@ -14,11 +14,26 @@ li {
     margin: 0;
 }
 
+.bg-pattern {
+    background-image: linear-gradient(to bottom, rgba(14, 114, 188, 0.4), rgba(14, 114, 188, 0.1)), url("/static/assets/papyrus.png");
+}
+
 .header-mast {
     background-image: url('/static/assets/backlit-beach.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     height: 200px;
+}
+
+.search-form {
+    padding: 30px;
+    padding-top: 60px;
+}
+
+@media screen and (min-width: 375px) {
+    .search-form {
+        padding: 80px;
+    }
 }
 
 @media screen and (max-width: 375px) {
