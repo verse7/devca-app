@@ -4,7 +4,9 @@ from functools import wraps
 from flask import render_template, request, jsonify
 from app import app, db, csrf
 from werkzeug.utils import secure_filename
-
+from werkzeug.security import check_password_hash
+from app.forms import *
+from app.models import *
 ###
 # Utility functions
 ###
@@ -54,6 +56,52 @@ def form_errors(form):
 ###
 # API endpoints
 ###
+@app.route('/api/register', methods=['POST'])
+def register():
+  form = RegistrationForm()
+  if form.validate_on_submit() == True:
+    firstname = form.firstname.data
+    lastname = form.lastname.data
+    email = form.email.data
+    password = form.password.data
+    photo = assignPath(form.photo.data)
+
+    try:
+      user = User(firstname, lastname, email, password, photo)
+      db.session.add(user)
+      db.session.commit()
+
+      success = "User sucessfully registered"
+      return jsonify(message=success), 201
+
+    except Exception as e:
+      print(e)
+      db.session.rollback()  #Remove the failed commit that occurred
+      return jsonify(error="An error occured with the server. Try again!"), 401
+
+  return jsonify(error="Error: Invalid/Missing user information"), 401
+
+@app.route('/api/auth/login', methods=['POST'])
+def login():
+  form = LoginForm()
+  if form.validate_on_submit() == True:
+    email = form.email.data
+    password = form.password.data
+
+    user = db.session.query(User).filter_by(email=email).first()
+
+    if user is not None and check_password_hash(user.password, password):
+
+      #create bearer token
+      payload = {'userid': user.id}
+      jwt_token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+
+      success = "User successfully logged in."
+      return jsonify(message=success, token=jwt_token, user_id=user.id)
+
+    return jsonify(error="Incorrect email or password"), 401
+  
+  return jsonify(error="Failed to login user"), 401
 
 
 ###
@@ -67,6 +115,14 @@ def index(path):
 ###
 # The functions below should be applicable to all Flask apps.
 ###
+
+#Save the uploaded photo to a folder
+def assignPath(upload):
+  filename = secure_filename(upload.filename)
+  upload.save(os.path.join(
+              app.config['UPLOAD_FOLDER'], filename
+  ))
+  return filename
 
 @app.route('/<file_name>.txt')
 def send_text_file(file_name):

@@ -1,7 +1,174 @@
+:root {
+    --primary: #C22551;
+    --secondary: #E84336;
+    --tertiary: #F16637;
+}
+
 body {
-    padding-top: 5rem;
+    font-family: 'Lato', sans-serif;
+    padding-bottom: 70px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    padding: 0;
+    margin: 0;
 }
 
 .shadow-sm {
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.modal {
+    animation-duration: 0.5s;
+}
+
+.message-listing {
+    list-style: square;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.card {
+    width: 60%;
+    padding: 0;
+    border: none;
+    outline: none;
+}
+
+.card img {
+    height: 250px;
+}
+
+@media screen and (min-width: 375px) {
+    .card {
+        width: 50%;
+    }
+}
+
+@media screen and (min-width: 425px) {
+    .card {
+        width: 40%;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .card {
+        width: 30%;
+    }
+
+    .card img {
+        height: 300px;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .card {
+        width: 25%;
+    }
+
+    .card img {
+        height: 375px;
+    }
+}
+
+.scrolling-wrapper {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+}
+
+::-webkit-scrollbar{
+  width: 6px;  /* for vertical scrollbars */
+  height: 6px; /* for horizontal scrollbars */
+}
+
+::-webkit-scrollbar-track{
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb{
+  background: rgba(0, 0, 0, 0.2);
+}
+
+@media screen and (max-width: 600px) {
+    .scrolling-wrapper::-webkit-scrollbar {
+        display: none;
+    }
+}
+  
+.scrolling-wrapper .card {
+    flex: 0 0 auto;
+}
+
+.tab-icon {
+    font-size: 20px;
+}
+
+.text-dark {
+    color: #222;
+}
+
+.no-outline {
+    outline: none;
+}
+
+.no-border {
+    border: none;
+}
+
+.bg-transparent {
+    background: rgba(0, 0, 0, 0);
+}
+
+.title-font {
+    font-family: 'Righteous', cursive;
+}
+
+.section-title {
+    font-size: 14px;
+}
+
+.shadow-sm {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.event-flyer {
+    height: 400px;
+}
+
+.event-flyer-title {
+    font-size: 24px;
+}
+
+.event-img-preview {
+    width: 180px;
+    height: 40vh;
+}
+
+.event {
+    flex-direction: column;
+}
+
+@media screen and (min-width: 600px) {
+    .event-header {
+        width: 300px;
+        margin-right: 48px;
+    }
+
+    .event-content {
+        width: 300px;
+    }
+
+    .event {
+        flex-direction: row;
+        justify-content: center;
+    }
 }
