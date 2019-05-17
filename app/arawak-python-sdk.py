@@ -1207,8 +1207,15 @@ class Claim:
                 "imageEvidence":imageEvidence, "phoneClaimer":phoneClaimer,"reason":reason}
         url = self.urlClaimForms + claimId
         return ExecuteQuery().Query(url,'PUT',data)
+
+class Media:
+    def __init__(self):
+        self.mediaURL = 'api.opencaribbean.org/api/v1/media/'    
     
-    
+    def getMediaFile(filename):
+        url = self.mediaURL + 'download/' + filename
+        return ExecuteQuery().Query(url,'GET')
+
 class ExecuteQuery:
     """ Class to execute queries
     Attributes:
