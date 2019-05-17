@@ -2,7 +2,7 @@ Vue.config.ignoredElements = ['ion-icon'];
 
 Vue.component('app-header', {
     template: `
-    <nav class="navbar navbar-expand-md navbar-light bg-transparent mb-2">
+    <nav class="navbar navbar-expand-md navbar-light bg-transparent fixed-top mb-2">
       <router-link class="navbar-brand title-font" to="/">DevCa</router-link>
     
       <div class="collapse navbar-collapse d-sm-none d-md-block">
@@ -14,13 +14,23 @@ Vue.component('app-header', {
             <router-link class="nav-link" to="/explore">Explore</router-link>
           </li>
           <li class="nav-item">
+            <router-link class="nav-link" to="/plan">Plan a Trip</router-link>
+          </li>
+          <li class="nav-item">
             <router-link class="nav-link" to="/login">Login</router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/register">Register</router-link>
           </li>
         </ul>
-      </div>
+        </div>
+        <ul class="navbar-nav ml-auto d-md-none">
+          <li class="nav-item">
+            <router-link class="nav-link" to="/plan">
+              <ion-icon class="text-dark tab-icon" name="calendar"></ion-icon>
+            </router-link>
+          </li>
+        </ul>
     </nav>
     `
 });
@@ -60,32 +70,62 @@ Vue.component('header-mast', {
     <div class="container d-flex flex-column justify-content-center align-items-center">
       <h1>Lorem Ipsum</h1>
       <div class="d-flex flex-row justify-content-center align-items-center">
-        <input type="text" class="form-control">
-        <button class="btn btn-primary">Search</button>
+        <input type="search" class="form-control mb-2 mr-sm-2" 
+          placeholder="Enter search term here" name="search" v-model="searchTerm">
+        <button class="btn btn-primary mb-2" @click="searchResources">Search</button>
       </div>
     </div>
   </div>
-  `
+  `,
+  data: function() {
+    return {
+      searchTerm: '',
+      resources: []
+    }
+  },
+  methods: {
+    searchResources: function() {
+      let self = this;
+
+      fetch(`http://api.opencaribbean.org/api/v1/playtour/resource/search?query=${self.searchTerm}`)
+      .then(function(res) {
+        return res.json();
+      })
+      .then(function(data) {
+        console.log(data);
+        self.resources = data;
+      })
+    }
+  }
 });
 
 Vue.component('resource-card', {
   template: `
-  <div class="card mr-2 bg-transparent text-dark">
+  <div class="card shadow-sm mr-2 bg-transparent text-dark">
+    <router-link to="/">
+      <img class="card-img img-fluid" 
+          :src="'http://api.opencaribbean.org/api/v1/media/download/' + resource.mainImage">
+    </router-link>
+    <small class="mt-1 font-weight-bold">{{ resource.name }}</small>
   </div>
   `,
-  props: ['resource']
+  props: ['resource'],
+  created: function() {
+    console.log('created');
+  }
 });
 
 Vue.component('resource-listing', {
   template: `
   <section class="mb-4">
-    <h1 class="font-weight-bold section-title">{{ title }}</h1>
+    <h1 class="font-weight-bold section-title">{{ type }}</h1>
     <div class="scrolling-wrapper">
-      <resource-card v-for="resource in resources"></resource-card>
+      <resource-card v-for="resource in resources" 
+        :resource="resource" :key="resource.id"></resource-card>
     </div>
   </section>
   `,
-  props: ['title'],
+  props: ['type'],
   data: function() {
     return {
       resources: []
@@ -94,7 +134,7 @@ Vue.component('resource-listing', {
   created: function() {
       let self = this;
 
-      fetch('', {
+      fetch(`http://api.opencaribbean.org/api/v1/playtour/resource/search?query=${self.type}`, {
         method: 'GET',
         credentials: 'same-origin'
       })
@@ -103,17 +143,16 @@ Vue.component('resource-listing', {
       })
       .then(data => {
         console.log(data);
+        self.resources = data;
       })
     }
 });
 
 const Home = Vue.component('home', {
     template: `
-    <div class="container">
+    <div class="container mt-4 p-3">
       <header-mast></header-mast>
-      <resource-listing type="hotels"></resource-listing>
-      <resource-listing type="attractions"></resource-listing>
-      <resource-listing type=""></resource-listing>
+      <resource-listing type="Hotel"></resource-listing>
     </div>
     `
 });
