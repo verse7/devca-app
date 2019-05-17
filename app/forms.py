@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import StringField, SelectField, TextAreaField, PasswordField
-from wtforms.fields.html5 import EmailField
-from wtforms.validators import InputRequired
+from wtforms.fields.html5 import EmailField, DateField
+from wtforms.validators import InputRequired, DataRequired
 
 
 class LoginForm(FlaskForm):
@@ -21,3 +21,11 @@ class GenericForm(FlaskForm):
     field2 = TextAreaField('field2', validators=[InputRequired()])
     field3 = FileField('field3', validators=[FileRequired(),  FileAllowed(['jpg','jpeg', 'png', 'Only images are accepted!'])])
     
+class BookingForm(FlaskForm):
+    class Meta:
+        csrf = False
+
+    country = StringField('country', validators=[InputRequired()])
+    city = StringField('city', validators=[InputRequired()])
+    startDate = StringField('startDate', validators=[DataRequired()])
+    endDate = StringField('endDate', validators=[DataRequired()])

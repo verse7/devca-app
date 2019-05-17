@@ -7,6 +7,8 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
 from app.forms import *
 from app.models import *
+from app.arawak_python_sdk import *
+
 ###
 # Utility functions
 ###
@@ -102,6 +104,40 @@ def login():
     return jsonify(error="Incorrect email or password"), 401
   
   return jsonify(error="Failed to login user"), 401
+
+
+@app.route('/api/bookables', methods=['POST'])
+@csrf.exempt
+def bookables():
+    form = BookingForm()
+
+    if form.validate_on_submit():
+        booking = BookableAndBooking()
+
+        data = booking.getFreeBookablesByIntervalDate('j8sEimoBSf6a6E5BcOFf', form.startDate.data, form.endDate.data).decode('utf-8')
+        status = 200
+    else:
+      data = form_errors(form)
+      status = 400
+
+    return jsonify(data), status
+
+
+@app.route('/api/bookables/<bookableId>', methods=['GET'])
+def bookable(bookableId):
+    bookable = BookableAndBooking()
+    
+    data = bookable.getBookableById(bookableId).decode('utf-8')
+
+    return jsonify(data), 200
+
+@app.route('/api/media/<filename>', methods=['GET'])
+def media(filename):
+    media = Media()
+    data = media.getMediaFile(filename).decode('utf-8')
+
+    return jsonify(data), 200
+
 
 
 ###
