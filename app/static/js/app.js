@@ -52,23 +52,24 @@ Vue.component('app-footer', {
 });
 
 Vue.component('resource-card', {
-  template: `
-  <div class="card mr-2 bg-transparent text-dark">
-    <span @click="selectResource">
-      <img class="card-img img-fluid" 
-          :src="'http://api.opencaribbean.org/api/v1/media/download/' + resource.mainImage">
-    </span>
-    <small class="mt-1 font-weight-bold">{{ resource.name }}</small>
-  </div>
+	template: `
+	<div>
+		<div class="card mr-2 bg-transparent text-dark" > 
+			<img class="card-img img-fluid"
+					:src="'http://api.opencaribbean.org/api/v1/media/download/' + resource.mainImage">
+			<small class="mt-1 font-weight-bold">{{ resource.name }}</small>
+		</div>
+		
+	</div>
   `,
   props: ['resource'],
   methods: {
     selectResource: function(){
-        console.log(this.resource.appId);
-        localStorage.setItem(this.type, JSON.stringify(this.resource));
+			console.log(this.resource.appId);
+			localStorage.setItem(this.type, JSON.stringify(this.resource));
 
-        console.log(JSON.parse(localStorage.getItem(this.type)));
-        router.push({name:"details", params:{details: this.resource}});
+			console.log(JSON.parse(localStorage.getItem(this.type)));
+			router.push({name:"details", params:{resource: this.resource}});
     }
   }
 });
@@ -324,68 +325,66 @@ const NotFound = Vue.component('not-found', {
 })
 
 const ResourcePicker = Vue.component('resource-picker', {
-  template: `
-    <div class="pl-5 pr-5" style="margin-top: 80px;">
-      <div class="p-4" v-for="category in Object.entries(filteredItems)">
-        <h1>{{ category[0] }}</h1>
-        <div v-if="category[1].length" class="scrolling-wrapper pt-3">
-          <resource-card v-for="resource in category[1]" :resource="resource" :key="resource.id" ></resource-card>
-        </div>
-        <div v-else>
-          No results
-        </div>
-      </div>      
-    </div>
+	template: `
+		<div>
+			<div class="pl-5 pr-5" style="margin-top: 80px;">
+				<a id="modalLink"  data-toggle="modal" href="#myModal"></a>
+				<div class="p-4" v-for="category in Object.entries(filteredItems)">
+					<h4>{{ category[0] }}</h4>
+					<div v-if="category[1].length" class="scrolling-wrapper pt-3">
+						<resource-card v-for="resource in category[1]" :resource="resource" :key="resource.id" v-on:click="select(resource)"></resource-card>
+					</div>
+					<div v-else>
+						No results
+					</div>
+				</div>     
+			</div>
+			<div class="modal fade" id="myModal" v-if="selectedResource !== null">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="model-body">
+							<resource-details :resource="selectedResource"></resource-details>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div v-else>helpppppppp</div>
+		</div>
   `,
   props: ['type', 'resources'],
   data: function(){
     return {
       filteredItems: {Accommodation: [], Attraction: [], Service: [], Tour: [], Event: [], Transportation_Operators: []},
-      // accomodation: [],
-      // attraction: [],
-      // service: [],
-      // tour: [],
-      // event: [],
-      // transportation_operators: [],
-      empty: false
+			empty: false,
+			selectedResource: null
     }
   },
   methods: {
-    isEmpty: function(){
-			this.empty = this.filteredItems.length === 0;
-		},
-		selectResource: function(resource) {
-			this.selectResource = resource;
-			bookStay();
-		},
-		bookStay: function() {
-			let bookingForm = new FormData();
-			bookingForm.append("bookableId", this.selectResource.bookeableList[0].bookableId);
-			bookingForm.append("dateend", localStorage.endDate);
-			bookingForm.append("datestart", localStorage.startDate);
-			bookingForm.append("idapp", this.selectResource.appId);
-			bookingForm.append("idresource", this.selectResource.id);
-			bookingForm.append("iduser", localStorage.getItem('current_user'));
-			bookingForm.append("status", "CREATED");
-
-
-			fetch('https://api.opencaribbean.org/api/v1/booking/bookings', {
-				method: 'POST', 
-				body: bookingForm,
-				credentials: 'same-origin'
-			})
-			.then(res => res.json())
-			.then(jsonResp => {
-				console.log(jsonResp);
-			});
+		select: function(index) {
+			console.log('select function called');
+			this.selectedResource = resources[index];
+			// console.log(res);
+			// let link = document.querySelector('#modalLink');
+			// console.log(`this is the link ${link}`);
+			// this.selectedResource = res;
+			link.click();
 		}
   },
   created: function(){
-      this.resources.forEach(element => {
-        if(this.filteredItems[element['__type']] != null){
-          this.filteredItems[element['__type']].push(element)
+		let self = this;
+			self.$route.params.resources.forEach(element => {
+				if(self.filteredItems[element['__type']] != null){
+          self.filteredItems[element['__type']].push(element)
         }
-      });
+			});
+      // self.resources.forEach(element => {
+      //   if(self.filteredItems[element['__type']] != null){
+      //     self.filteredItems[element['__type']].push(element)
+      //   }
+      // });
   }
 })
 
@@ -395,27 +394,27 @@ const ResourceDetails = Vue.component('resource-details', {
     <div class="card mb-3 pl-5 pr-5 bg-pattern" style="width: 100%;">
       <div class="row no-gutters" style="padding: 80px 0 0 20px;">
         <div class="col-md-4 pb-5">
-          <img :src="'http://api.opencaribbean.org/api/v1/media/download/' + details.mainImage" class="card-img" alt="Image of resource"
+          <img :src="'http://api.opencaribbean.org/api/v1/media/download/' + resource.mainImage" class="card-img" alt="Image of resource"
           style="width: 90%; height: 100%;">
         </div>
         <div class="col-md-8 pb-5">
           <div class="card-body no-padding">
-            <h5 class="card-title">{{ details.name }}</h5>
-            <p class="card-text">{{ details.street }}</p>
-            <p class="card-text">{{ details.community }}, {{ details.state }}</p>
-            <p class="card-text">{{ details.email }}</p>
-            <p class="card-text">{{ details.country.name }}</p>
-            <p class="card-text"><small class="text-muted">Last updated {{ details.updatedAt }}</small></p>
+            <h5 class="card-title">{{ resource.name }}</h5>
+            <p class="card-text">{{ resource.street }}</p>
+            <p class="card-text">{{ resource.community }}, {{ resource.state }}</p>
+            <p class="card-text">{{ resource.email }}</p>
+            <p class="card-text">{{ resource.country.name }}</p>
+            <p class="card-text"><small class="text-muted">Last updated {{ resource.updatedAt }}</small></p>
           </div>
         </div>
-        <p class="card-text">{{ details.description }}</p>
-         <h4 class="font-weight-bold pr-5 pb-4">Select {{ details.__type }}: </h4>
+        <p class="card-text">{{ resource.description }}</p>
+         <h4 class="font-weight-bold pr-5 pb-4">Select {{ resource.__type }}: </h4>
          <button @click="bookStay" class="btn btn-dark btn-size pl-5 d-flex align-items-center" type="submit">Book</button>
       </div>
     </div>
     <div class="container">
       <ul class="row list-inline">
-        <li class="col-sm-4" v-for="photo in details.images">
+        <li class="col-sm-4" v-for="photo in resource.images">
           <div class="card-body">
             <img :src="'http://api.opencaribbean.org/api/v1/media/download/' + photo" alt="Additional Images of the resource" 
             class="img-fluid card-img-top">
@@ -425,18 +424,18 @@ const ResourceDetails = Vue.component('resource-details', {
     </div>
   </div>
   `,
-  props: ['details'],
+  props: ['resource'],
   created: function(){
-    console.log(this.details);
+    console.log(this.resource);
   },
   methods: {
     bookStay: function() {
       let bookingForm = new FormData();
-      bookingForm.append("bookableId", this.details.bookeableList[0].bookableId);
+      bookingForm.append("bookableId", this.resource.bookeableList[0].bookableId);
       bookingForm.append("dateend", localStorage.endDate);
       bookingForm.append("datestart", localStorage.startDate);
-      bookingForm.append("idapp", this.details.appId);
-      bookingForm.append("idresource", this.details.id);
+      bookingForm.append("idapp", this.resource.appId);
+      bookingForm.append("idresource", this.resource.id);
       bookingForm.append("iduser", localStorage.getItem('current_user'));
       bookingForm.append("status", "CREATED");
 
