@@ -393,7 +393,7 @@ const ResourceDetails = Vue.component('resource-details', {
         </div>
         <p class="card-text">{{ details.description }}</p>
          <h4 class="font-weight-bold pr-5 pb-4">Select {{ details.__type }}: </h4>
-         <button class="btn btn-dark btn-size pl-5 d-flex align-items-center" type="submit">Book</button>
+         <button @click="bookStay" class="btn btn-dark btn-size pl-5 d-flex align-items-center" type="submit">Book</button>
       </div>
     </div>
     <div class="container">
@@ -411,8 +411,32 @@ const ResourceDetails = Vue.component('resource-details', {
   props: ['details'],
   created: function(){
     console.log(this.details);
+  },
+  methods: {
+    bookStay: function() {
+      let bookingForm = new FormData();
+      bookingForm.append("bookableId", this.details.bookeableList[0].bookableId);
+      bookingForm.append("dateend", localStorage.endDate);
+      bookingForm.append("datestart", localStorage.startDate);
+      bookingForm.append("idapp", this.details.appId);
+      bookingForm.append("idresource", this.details.id);
+      bookingForm.append("iduser", localStorage.getItem('current_user'));
+      bookingForm.append("status", "CREATED");
+
+
+      fetch('https://api.opencaribbean.org/api/v1/booking/bookings', {
+          method: 'POST', 
+          body: bookingForm,
+          credentials: 'same-origin'
+      })
+      .then(res => res.json())
+      .then(jsonResp => {
+          console.log(jsonResp);
+      });
+    }
   }
-})
+});
+
 const router = new VueRouter({
     mode: 'history',
     routes: [
