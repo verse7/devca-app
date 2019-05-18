@@ -54,16 +54,21 @@ Vue.component('app-footer', {
 Vue.component('resource-card', {
   template: `
   <div class="card mr-2 bg-transparent text-dark">
-    <router-link to="/">
+    <span @click="selectResource">
       <img class="card-img img-fluid" 
           :src="'http://api.opencaribbean.org/api/v1/media/download/' + resource.mainImage">
-    </router-link>
+    </span>
     <small class="mt-1 font-weight-bold">{{ resource.name }}</small>
   </div>
   `,
-  props: ['resource'],
-  created: function() {
-    console.log('created');
+  props: ['type','resource'],
+  methods: {
+    selectResource: function(){
+        console.log(this.resource.appId);
+        localStorage.setItem(this.type, JSON.stringify(this.resource));
+
+        console.log(JSON.parse(localStorage.getItem(this.type)));
+    }
   }
 });
 
@@ -316,20 +321,20 @@ const NotFound = Vue.component('not-found', {
 const ResourcePicker = Vue.component('resource-picker', {
   template: `
     <div>
-      <div class="pl-5" style="margin-top: 80px;">
+      <div class="pl-5 pr-5" style="margin-top: 80px;">
         <h1>{{ types[index] }}</h1>
         <div v-if="empty">
           No search results for {{ types[index] }}s
         </div>
         <div v-else>
           <div class="scrolling-wrapper pt-3">
-            <resource-card v-for="resource in filteredItems" :resource="resource" :key="resource.id"></resource-card>
+            <resource-card v-for="resource in filteredItems" :resource="resource" :key="resource.id" type="types[index]"></resource-card>
           </div>
         </div>
-        <div v-if="index < 5">
+        <div class="d-flex justify-content-end pt-5 pr-5" v-if="index < 5">
           <button @click="toNext" style="cursor:pointer;" class="btn btn-info font-weight-bold">Next/Skip</button>
         </div>
-        <div v-else>
+        <div class="d-flex justify-content-end pt-5 pr-5" v-else>
           <button class="btn btn-warning font-weight-bold">Plan Trip</button>
         </div>
       </div>
