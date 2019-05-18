@@ -288,6 +288,9 @@ const Search = Vue.component('search', {
       
 			let s = new Date(startDate.value).toISOString();
 			let e = new Date(endDate.value).toISOString();
+			
+			localStorage.setItem('startDate', s);
+			localStorage.setItem('endDate', e);
       
       fetch('http://api.opencaribbean.org/api/v1/playtour/resource/page/availables?countryId='+ self.countryId +'&startDate='+ s +'&endDate='+ e +'&onlybookable=true&page=0&size=100', {
         method: 'GET'
@@ -328,11 +331,11 @@ const ResourcePicker = Vue.component('resource-picker', {
         </div>
         <div v-else>
           <div class="scrolling-wrapper pt-3">
-            <resource-card v-for="resource in filteredItems" :resource="resource" :key="resource.id" type="types[index]"></resource-card>
+            <resource-card v-for="resource in filteredItems" @click="selectResource(resource)" :resource="resource" :key="resource.id" type="types[index]"></resource-card>
           </div>
         </div>
         <div class="d-flex justify-content-end pt-5 pr-5" v-if="index < 5">
-          <button @click="toNext" style="cursor:pointer;" class="btn btn-info font-weight-bold">Next/Skip</button>
+          <button @click="" style="cursor:pointer;" class="btn btn-info font-weight-bold">Next/Skip</button>
         </div>
         <div class="d-flex justify-content-end pt-5 pr-5" v-else>
           <button class="btn btn-warning font-weight-bold">Plan Trip</button>
@@ -343,6 +346,7 @@ const ResourcePicker = Vue.component('resource-picker', {
   props: ['type', 'resources'],
   data: function(){
     return {
+			selectedResource: null,
 			filteredItems: [],
 			types: ['Accommodation', 'Attraction', 'Service', 'Tour', 'Event', 'Transportation_Operators'],
       index: -1,
@@ -353,18 +357,31 @@ const ResourcePicker = Vue.component('resource-picker', {
     isEmpty: function(){
 			this.empty = this.filteredItems.length === 0;
 		},
-		toNext: function(){
-      this.index++;
-      let result = [];
-      this.filteredItems = [];
-      this.resources.forEach(element => {
-        if(element['__type'] === this.types[this.index]){
-          result.push(element);
-        }
-      });
-      this.filteredItems = result;
-      this.isEmpty();
-    }
+		selectResource: function(resource) {
+			this.selectResource = resource;
+			bookStay();
+		},
+		bookStay: function() {
+			let bookingForm = new FormData();
+			bookingForm.append("bookableId", this.selectResource.bookeableList[0].bookableId);
+			bookingForm.append("dateend", localStorage.endDate);
+			bookingForm.append("datestart", localStorage.startDate);
+			bookingForm.append("idapp", this.selectResource.appId);
+			bookingForm.append("idresource", this.selectResource.id);
+			bookingForm.append("iduser", localStorage.getItem('current_user'));
+			bookingForm.append("status", "CREATED");
+
+
+			fetch('https://api.opencaribbean.org/api/v1/booking/bookings', {
+				method: 'POST', 
+				body: bookingForm,
+				credentials: 'same-origin'
+			})
+			.then(res => res.json())
+			.then(jsonResp => {
+				console.log(jsonResp);
+			});
+		}
   },
   created: function(){
 		this.toNext();
