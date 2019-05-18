@@ -316,26 +316,28 @@ const ResourcePicker = Vue.component('resource-picker', {
   template: `
     <div>
       <h1>{{ type }}<h1>
-      
+
     </div>
   `,
   props: ['type', 'resources'],
-  data:{},
+  data: function(){
+    return {
+      filteredItems: []
+    }
+  },
   methods: {
     isEmpty: function(){
       return filter === []
     }
   },
-  computed: {
-      filter: function(){
-        result = []
-        resources.forEach(element => {
-          if(element['__type'] == type){
-            result.push(element);
-          }
-        });
-        return result
-      }
+  created: function(){
+      result = []
+      resources.forEach(element => {
+        if(element['__type'] === type){
+          result.push(element);
+        }
+      });
+      this.filteredItems = result
   }
 })
 
