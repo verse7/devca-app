@@ -431,7 +431,7 @@ const ResourceDetails = Vue.component('resource-details', {
       })
       .then(res => res.json())
       .then(jsonResp => {
-          console.log(jsonResp);
+          console.log(jsonResp)
       });
     }
   }
