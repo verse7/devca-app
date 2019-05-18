@@ -54,9 +54,17 @@ Vue.component('app-footer', {
 Vue.component('resource-card', {
   template: `
   <div class="card mr-2 bg-transparent text-dark">
+    <router-link to="/">
+      <img class="card-img img-fluid" 
+          :src="'http://api.opencaribbean.org/api/v1/media/download/' + resource.mainImage">
+    </router-link>
+    <small class="mt-1 font-weight-bold">{{ resource.name }}</small>
   </div>
   `,
-  props: ['resource']
+  props: ['resource'],
+  created: function() {
+    console.log('created');
+  }
 });
 
 Vue.component('resource-listing', {
@@ -64,11 +72,11 @@ Vue.component('resource-listing', {
   <section class="mb-4">
     <h1 class="font-weight-bold section-title">{{ title }}</h1>
     <div class="scrolling-wrapper">
-      <resource-card v-for="resource in resources"></resource-card>
+      <resource-card v-for="resource in resources" :resource="resource" :key="resource.id"></resource-card>
     </div>
   </section>
   `,
-  props: ['title'],
+  props: ['title', 'type'],
   data: function() {
     return {
       resources: []
@@ -77,7 +85,7 @@ Vue.component('resource-listing', {
   created: function() {
       let self = this;
 
-      fetch('', {
+      fetch('http://api.opencaribbean.org/api/v1/playtour/resource/search?query=' + self.type, {
         method: 'GET',
         credentials: 'same-origin'
       })
@@ -86,15 +94,21 @@ Vue.component('resource-listing', {
       })
       .then(data => {
         console.log(data);
+        self.resources = data;
       })
     }
 });
 
 const Home = Vue.component('home', {
     template: `
-    <div class="bg-pattern">
-      <search></search>
-      <resource-listing></resource-listing>
+    <div>
+      <div class="bg-pattern mb-4">
+        <search></search>
+      </div>
+      <div class="container">
+        <resource-listing title="Hotels" type="HOTEL"></resource-listing>
+        <resource-listing title="Vill" type="MOTEL"></resource-listing>
+      </div>
     </div>
     `
 });
@@ -221,11 +235,7 @@ const Search = Vue.component('search', {
       <form class="row pl-3" @submit.prevent="search" method="post">
           <div class="form-group pr-2">
             <label>Country</label>
-            <input type="text" name="country" class="form-control" placeholder="Enter Country">
-          </div>
-          <div class="form-group pr-2">
-            <label>City</label>
-            <input type="text" name="city" class="form-control" placeholder="Enter City">
+            <input id="country" type="text" v-on:blur="findCountry" name="country" class="form-control" placeholder="Enter Country">
           </div>
           <div class="form-group pr-2">
             <label>Start Date</label>
@@ -236,7 +246,7 @@ const Search = Vue.component('search', {
             <input type="date" id="endDate" name="endDate" class="form-control" placeholder="End Date">
           </div>
           <div class="form-group d-flex align-items-end">
-            <input type="submit" value="Submit" class="btn btn-primary font-weight-bold">
+            <input type="submit" value="Search" class="btn btn-primary">
           </div>
       </form>
     </div>
@@ -251,12 +261,35 @@ const Search = Vue.component('search', {
 			credentials: 'same-origin'
 		}).then()
 	},
+  data: function() {
+    return {
+      countryId: ''
+    }
+  },
 	methods: {
+    findCountry: function() {
+      let self = this;
+      let country = document.getElementById('country').value;
+
+      fetch('https://api.opencaribbean.org/api/v1/location/countries/search?name='+ country +'&page=0&size=1', {
+        method: 'GET'
+      })
+      .then(function(res) {
+        return res.json();
+      })
+      .then(function (jsonResponse) {
+        console.log(jsonResponse)
+        self.countryId = jsonResponse.content[0]['id']
+      })
+      .catch(function(err) {
+        console.log(err);
+      })
+    },
 		search: function() {
-			let form = document.querySelector('form');
+			let self = this;
 			let startDate =document.getElementById("startDate");
-			let endDate =document.getElementById("endDate");
-			formData = new FormData(form);
+      let endDate =document.getElementById("endDate");
+      
 			let s = new Date(startDate.value).toISOString();
 			let e = new Date(endDate.value).toISOString();
       formData.set("startDate", s);
@@ -273,13 +306,8 @@ const Search = Vue.component('search', {
 				console.log(jsonResp);
 			});
       
-      fetch('/api/bookables', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-CSRFToken': token,
-        },
-        credentials: 'same-origin'
+      fetch('http://api.opencaribbean.org/api/v1/playtour/resource/page/availables?countryId='+ self.countryId +'&startDate='+ s +'&endDate='+ e +'&onlybookable=true&page=0&size=100', {
+        method: 'GET'
       })
       .then(function (response) {
         return response.json();
@@ -287,6 +315,7 @@ const Search = Vue.component('search', {
       .then(function (jsonResponse) {
         console.log(jsonResponse);
         router.push({name: 'available', params:{bookable_data: jsonResponse}});
+        //filter responses here to find resources with accommodations
       })
       .catch(function (error) {
         console.log(error);
