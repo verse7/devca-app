@@ -68,6 +68,7 @@ Vue.component('resource-card', {
         localStorage.setItem(this.type, JSON.stringify(this.resource));
 
         console.log(JSON.parse(localStorage.getItem(this.type)));
+        router.push({name:"details", params:{details: this.resource}});
     }
   }
 });
@@ -371,6 +372,47 @@ const ResourcePicker = Vue.component('resource-picker', {
   }
 })
 
+const ResourceDetails = Vue.component('resource-details', {
+  template: `
+  <div>
+    <div class="card mb-3 pl-5 pr-5 bg-pattern" style="width: 100%;">
+      <div class="row no-gutters" style="padding: 80px 0 0 20px;">
+        <div class="col-md-4 pb-5">
+          <img :src="'http://api.opencaribbean.org/api/v1/media/download/' + details.mainImage" class="card-img" alt="Image of resource"
+          style="width: 90%; height: 100%;">
+        </div>
+        <div class="col-md-8 pb-5">
+          <div class="card-body no-padding">
+            <h5 class="card-title">{{ details.name }}</h5>
+            <p class="card-text">{{ details.street }}</p>
+            <p class="card-text">{{ details.community }}, {{ details.state }}</p>
+            <p class="card-text">{{ details.email }}</p>
+            <p class="card-text">{{ details.country.name }}</p>
+            <p class="card-text"><small class="text-muted">Last updated {{ details.updatedAt }}</small></p>
+          </div>
+        </div>
+        <p class="card-text">{{ details.description }}</p>
+         <h4 class="font-weight-bold pr-5 pb-4">Select {{ details.__type }}: </h4>
+         <button class="btn btn-dark btn-size pl-5 d-flex align-items-center" type="submit">Book</button>
+      </div>
+    </div>
+    <div class="container">
+      <ul class="row list-inline">
+        <li class="col-sm-4" v-for="photo in details.images">
+          <div class="card-body">
+            <img :src="'http://api.opencaribbean.org/api/v1/media/download/' + photo" alt="Additional Images of the resource" 
+            class="img-fluid card-img-top">
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  `,
+  props: ['details'],
+  created: function(){
+    console.log(this.details);
+  }
+})
 const router = new VueRouter({
     mode: 'history',
     routes: [
@@ -378,6 +420,7 @@ const router = new VueRouter({
         {path: "/login", name: "login", component: Login, props: true},
         {path: "/register", name: "register", component: Register, props: true},
         {path: "/results", name: "results", component: ResourcePicker, props: true},
+        {path: "/details", name: "details", component: ResourceDetails, props: true},
         // This is a catch all route in case none of the above matches
         {path: "*", component: NotFound}
     ]
