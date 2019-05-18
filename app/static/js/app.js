@@ -328,20 +328,25 @@ const ResourcePicker = Vue.component('resource-picker', {
 	template: `
 		<div>
 			<div class="pl-5 pr-5" style="margin-top: 80px;">
-				<a id="modalLink"  data-toggle="modal" href="#myModal"></a>
 				<div class="p-4" v-for="category in Object.entries(filteredItems)">
 					<h4>{{ category[0] }}</h4>
 					<div v-if="category[1].length" class="scrolling-wrapper pt-3">
-						<resource-card v-for="resource in category[1]" :resource="resource" :key="resource.id" v-on:click="select(resource)"></resource-card>
+						<a v-for="resource in category[1]" data-toggle="modal" href="#myModal" @click="select(resource, $event)">
+							<resource-card :resource="resource" :key="resource.id" v-on:click="select(resource)"></resource-card>
+						</a>
 					</div>
 					<div v-else>
 						No results
 					</div>
 				</div>     
 			</div>
+
 			<div class="modal fade" id="myModal" v-if="selectedResource !== null">
 				<div class="modal-dialog">
 					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+						</div>
 						<div class="model-body">
 							<resource-details :resource="selectedResource"></resource-details>
 						</div>
@@ -351,7 +356,6 @@ const ResourcePicker = Vue.component('resource-picker', {
 					</div>
 				</div>
 			</div>
-			<div v-else>helpppppppp</div>
 		</div>
   `,
   props: ['type', 'resources'],
@@ -363,28 +367,26 @@ const ResourcePicker = Vue.component('resource-picker', {
     }
   },
   methods: {
-		select: function(index) {
+		select: function(res, event) {
 			console.log('select function called');
-			this.selectedResource = resources[index];
-			// console.log(res);
-			// let link = document.querySelector('#modalLink');
-			// console.log(`this is the link ${link}`);
-			// this.selectedResource = res;
-			link.click();
+			event.preventDefault();
+			console.log(res);
+			this.selectedResource = res;
+			event.returnValue = true;
 		}
   },
   created: function(){
 		let self = this;
-			self.$route.params.resources.forEach(element => {
-				if(self.filteredItems[element['__type']] != null){
-          self.filteredItems[element['__type']].push(element)
-        }
-			});
-      // self.resources.forEach(element => {
-      //   if(self.filteredItems[element['__type']] != null){
+			// self.$route.params.resources.forEach(element => {
+			// 	if(self.filteredItems[element['__type']] != null){
       //     self.filteredItems[element['__type']].push(element)
       //   }
-      // });
+			// });
+      self.resources.forEach(element => {
+        if(self.filteredItems[element['__type']] != null){
+          self.filteredItems[element['__type']].push(element)
+        }
+      });
   }
 })
 
@@ -409,7 +411,7 @@ const ResourceDetails = Vue.component('resource-details', {
         </div>
         <p class="card-text">{{ resource.description }}</p>
          <h4 class="font-weight-bold pr-5 pb-4">Select {{ resource.__type }}: </h4>
-         <button @click="bookStay" class="btn btn-dark btn-size pl-5 d-flex align-items-center" type="submit">Book</button>
+         <button @click="bookStay" class="btn btn-dark btn-size pl-5 mb-4 d-flex align-items-center" type="submit">Book</button>
       </div>
     </div>
     <div class="container">
