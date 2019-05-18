@@ -229,11 +229,11 @@ const Search = Vue.component('search', {
           </div>
           <div class="form-group pr-2">
             <label>Start Date</label>
-            <input type="date" id="startDate" name="startDate" class="form-control"placeholder="Start Date">
+            <input type="date" id="startDate" name="startDate" class="form-control" placeholder="Start Date">
           </div>
           <div class="form-group pr-2">
             <label>End Date</label>
-            <input type="date" id="endDate" name="endDate" class="form-control"placeholder="End Date">
+            <input type="date" id="endDate" name="endDate" class="form-control" placeholder="End Date">
           </div>
           <div class="form-group d-flex align-items-end">
             <input type="submit" value="Submit" class="btn btn-primary font-weight-bold">
@@ -242,6 +242,15 @@ const Search = Vue.component('search', {
     </div>
   </div>
 	`,
+	created: function() {
+		fetch('http://api.opencaribbean.org/api/v1/location/countries', {
+			method: 'GET',
+			header: {
+				'X-CSRFToken': token,
+			},
+			credentials: 'same-origin'
+		}).then()
+	},
 	methods: {
 		search: function() {
 			let form = document.querySelector('form');
@@ -252,6 +261,17 @@ const Search = Vue.component('search', {
 			let e = new Date(endDate.value).toISOString();
       formData.set("startDate", s);
 			formData.set("endDate", e);
+
+			fetch('http://api.opencaribbean.org/api/v1/playtour/resource/page/availables', {
+				method: 'POST',
+				body: formData,
+				header: {
+					'X-CSRFToken': token
+				},
+				credentials: 'same-origin'
+			}).then(resp => resp.json()).then(jsonResp => {
+				console.log(jsonResp);
+			});
       
       fetch('/api/bookables', {
         method: 'POST',
@@ -266,12 +286,47 @@ const Search = Vue.component('search', {
       })
       .then(function (jsonResponse) {
         console.log(jsonResponse);
+        router.push({name: 'available', params:{bookable_data: jsonResponse}});
       })
       .catch(function (error) {
         console.log(error);
       })
 		}
 	}
+});
+
+const Available = Vue.component('available', {
+  template: `
+  <div>
+  </div>
+  `,
+  created: function() {
+    let self = this;
+    
+    let bk = JSON.parse(this.bookable_data);
+    bk.forEach(bookable=> {
+      fetch(`api/bookables/${bookable.bookableId}`, {
+        method: 'GET',
+        headers: {
+
+        },
+        credentials: 'same-origin'
+      })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (jsonResponse) {
+        console.log(jsonResponse)
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    })
+  },
+  props: ['bookable_data'],
+  data: function() {
+    return {};
+  }
 });
 
 const NotFound = Vue.component('not-found', {
@@ -291,6 +346,7 @@ const router = new VueRouter({
         {path: "/", name: "home", component: Home, props: true},
         {path: "/login", name: "login", component: Login, props: true},
         {path: "/register", name: "register", component: Register, props: true},
+        {path: "/available", name: "available", component: Available, props: true},
         // This is a catch all route in case none of the above matches
         {path: "*", component: NotFound}
     ]
