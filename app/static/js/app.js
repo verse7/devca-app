@@ -67,7 +67,7 @@ Vue.component('resource-card', {
   }
 });
 
-Vue.component('default-listing', {
+Vue.component('resource-listing', {
   template: `
   <section class="mb-4">
     <h1 class="font-weight-bold section-title">{{ title }}</h1>
@@ -93,11 +93,11 @@ Vue.component('default-listing', {
         return res.json()
       })
       .then(data => {
-        // console.log(data);
+        console.log(data);
         self.resources = data;
       })
-    }
-});
+		}
+	});
 
 const Home = Vue.component('home', {
     template: `
@@ -106,8 +106,8 @@ const Home = Vue.component('home', {
         <search></search>
       </div>
       <div class="container">
-        <default-listing title="Hotels" type="HOTEL"></default-listing>
-        <default-listing title="Vill" type="MOTEL"></default-listing>
+        <resource-listing title="Hotels" type="HOTEL"></resource-listing>
+        <resource-listing title="Vill" type="MOTEL"></resource-listing>
       </div>
     </div>
     `
@@ -269,7 +269,7 @@ const Search = Vue.component('search', {
         return res.json();
       })
       .then(function (jsonResponse) {
-        // console.log(jsonResponse)
+        console.log(jsonResponse)
         self.countryId = jsonResponse.content[0]['id']
       })
       .catch(function(err) {
@@ -292,8 +292,8 @@ const Search = Vue.component('search', {
       })
       .then(function (jsonResponse) {
         console.log(jsonResponse);
-        //filter responses here to find resources with accommodations
-        router.push({name:"results", params:{resources: jsonResponse.content}});
+				//filter responses here to find resources with accommodations
+				router.push({name:"results", params:{resources: jsonResponse.content}});
       })
       .catch(function (error) {
         console.log(error);
@@ -316,39 +316,39 @@ const NotFound = Vue.component('not-found', {
 const ResourcePicker = Vue.component('resource-picker', {
   template: `
     <div>
-      <div class="pl-5" style="margin-top: 80px;">
-        <h1>{{ types[index] }}</h1>
-        <div v-if="empty">
-          No search results for {{ types[index] }}s
-        </div>
-        <div v-else>
-          <div class="scrolling-wrapper pt-3">
-            <resource-card v-for="resource in filteredItems" :resource="resource" :key="resource.id"></resource-card>
-          </div>
-        </div>
-        <div v-if="index < 5">
-          <button @click="toNext" style="cursor:pointer;" class="btn btn-info font-weight-bold">Next/Skip</button>
-        </div>
-        <div v-else>
-          <button class="btn btn-warning font-weight-bold">Plan Trip</button>
-        </div>
-      </div>
+			<div class="pl-5" style="margin-top: 80px;">
+				<h1>{{ types[index] }}</h1>
+				<div v-if="empty">
+					No search results for {{ types[index] }}s
+				</div>
+				<div v-else>
+					<div class="scrolling-wrapper pt-3">
+						<resource-card v-for="resource in filteredItems" :resource="resource" :key="resource.id"></resource-card>
+					</div>
+				</div>
+				<div v-if="index < 5">
+					<button @click="toNext" style="cursor:pointer;" class="btn btn-info font-weight-bold">Next/Skip</button>
+				</div>
+				<div v-else>
+					<button class="btn btn-warning font-weight-bold">Plan Trip</button>
+				</div>
+			</div>
     </div>
   `,
-  props: ['resources'],
+  props: ['type', 'resources'],
   data: function(){
     return {
-      filteredItems: [],
-      types: ['Accommodation', 'Attraction', 'Service', 'Tour', 'Event', 'Transportation_Operators'],
+			filteredItems: [],
+			types: ['Accommodation', 'Attraction', 'Service', 'Tour', 'Event', 'Transportation_Operators'],
       index: -1,
       empty: false
     }
   },
   methods: {
     isEmpty: function(){
-      this.empty = this.filteredItems.length === 0;
-    },
-    toNext: function(){
+			this.empty = this.filteredItems.length === 0;
+		},
+		toNext: function(){
       this.index++;
       let result = [];
       this.filteredItems = [];
@@ -362,7 +362,7 @@ const ResourcePicker = Vue.component('resource-picker', {
     }
   },
   created: function(){
-      this.toNext();
+		this.toNext();
   }
 })
 
