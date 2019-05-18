@@ -61,16 +61,17 @@ Vue.component('resource-card', {
     <small class="mt-1 font-weight-bold">{{ resource.name }}</small>
   </div>
   `,
-  props: ['type','resource'],
+  props: ['resource'],
   methods: {
     selectResource: function(){
         console.log(this.resource.appId);
-        localStorage.setItem(this.type, JSON.stringify(this.resource));
+        // localStorage.setItem(this.type, JSON.stringify(this.resource));
 
-        console.log(JSON.parse(localStorage.getItem(this.type)));
+        // console.log(JSON.parse(localStorage.getItem(this.type)));
     }
   }
 });
+
 
 Vue.component('default-listing', {
   template: `
@@ -320,32 +321,28 @@ const NotFound = Vue.component('not-found', {
 
 const ResourcePicker = Vue.component('resource-picker', {
   template: `
-    <div>
-      <div class="pl-5 pr-5" style="margin-top: 80px;">
-        <h1>{{ types[index] }}</h1>
-        <div v-if="empty">
-          No search results for {{ types[index] }}s
+    <div class="pl-5 pr-5" style="margin-top: 80px;">
+      <div class="p-4" v-for="category in Object.entries(filteredItems)">
+        <h1>{{ category[0] }}</h1>
+        <div v-if="category[1].length" class="scrolling-wrapper pt-3">
+          <resource-card v-for="resource in category[1]" :resource="resource" :key="resource.id" ></resource-card>
         </div>
         <div v-else>
-          <div class="scrolling-wrapper pt-3">
-            <resource-card v-for="resource in filteredItems" :resource="resource" :key="resource.id" type="types[index]"></resource-card>
-          </div>
+          No results
         </div>
-        <div class="d-flex justify-content-end pt-5 pr-5" v-if="index < 5">
-          <button @click="toNext" style="cursor:pointer;" class="btn btn-info font-weight-bold">Next/Skip</button>
-        </div>
-        <div class="d-flex justify-content-end pt-5 pr-5" v-else>
-          <button class="btn btn-warning font-weight-bold">Plan Trip</button>
-        </div>
-      </div>
+      </div>      
     </div>
   `,
   props: ['resources'],
   data: function(){
     return {
-      filteredItems: [],
-      types: ['Accommodation', 'Attraction', 'Service', 'Tour', 'Event', 'Transportation_Operators'],
-      index: -1,
+      filteredItems: {Accommodation: [], Attraction: [], Service: [], Tour: [], Event: [], Transportation_Operators: []},
+      // accomodation: [],
+      // attraction: [],
+      // service: [],
+      // tour: [],
+      // event: [],
+      // transportation_operators: [],
       empty: false
     }
   },
@@ -367,7 +364,11 @@ const ResourcePicker = Vue.component('resource-picker', {
     }
   },
   created: function(){
-      this.toNext();
+      this.resources.forEach(element => {
+        if(this.filteredItems[element['__type']] != null){
+          this.filteredItems[element['__type']].push(element)
+        }
+      });
   }
 })
 
