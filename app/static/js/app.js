@@ -312,6 +312,33 @@ const NotFound = Vue.component('not-found', {
     }
 })
 
+const ResourcePicker = Vue.component('resource-picker', {
+  template: `
+    <div>
+      <h1>{{ type }}<h1>
+      
+    </div>
+  `,
+  props: ['type', 'resources'],
+  data:{},
+  methods: {
+    isEmpty: function(){
+      return filter === []
+    }
+  },
+  computed: {
+      filter: function(){
+        result = []
+        resources.forEach(element => {
+          if(element['__type'] == type){
+            result.push(element);
+          }
+        });
+        return result
+      }
+  }
+})
+
 const router = new VueRouter({
     mode: 'history',
     routes: [
