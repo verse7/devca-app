@@ -17,7 +17,7 @@ Vue.component('app-header', {
             <router-link class="nav-link" to="/login">Login</router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/events">Events</router-link>
+            <router-link class="nav-link" to="/attractions">Attractions</router-link>
           </li>
         </ul>
       </div>
@@ -229,15 +229,27 @@ const Login = Vue.component('login', {
   }
 });
 
-const Events = Vue.component('events', {
+const Attractions = Vue.component('attractions', {
   template: `
   <div>
+    <h1>Treasure Beach Attractions</h1>
+    <ul class="card-deck">
+      <li v-for="place in attractions">
+        <div class="card" style="width: 20rem;">
+          <div class="card-body">
+            <h5 class="card-title">{{ place.Name }}</h5>
+            <p class="card-text">{{ place.Description }}</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+          </div>
+        </div>
+      </li>
+    </ul>
   </div>
   `,
   created: function() {
     let self = this;
 
-    fetch('/api/auth/events', {
+    fetch('/api/auth/attractions', {
       method: 'GET',
       headers: {
         'X-CSRFToken': token
@@ -249,10 +261,16 @@ const Events = Vue.component('events', {
     })
     .then(function (jsonResponse) {
       console.log(jsonResponse);
+      self.attractions = jsonResponse.events;
     })
     .catch(function (error) {
       console.log(error);
     })
+  },
+  data: function(){
+    return {
+      attractions: []
+    };
   }
 });
 
@@ -273,7 +291,7 @@ const router = new VueRouter({
         {path: "/", name: "home", component: Home, props: true},
         {path: "/login", name: "login", component: Login, props: true},
         {path: "/register", name: "register", component: Register, props: true},
-        {path: "/events", component: Events},
+        {path: "/attractions", component: Attractions},
         // This is a catch all route in case none of the above matches
         {path: "*", component: NotFound}
     ]

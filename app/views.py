@@ -105,7 +105,7 @@ def login():
   
   return jsonify(error="Failed to login user"), 401
 
-@app.route('/api/auth/events', methods=['GET'])
+@app.route('/api/auth/attractions', methods=['GET'])
 def eventsDisplay():
   #open csv file and read csv contents
   with open('./app/static/assets/treasure-beach-entity_data.csv', encoding="utf8", errors='ignore') as csvfile:
@@ -113,11 +113,10 @@ def eventsDisplay():
     header = next(reader)
     
     # rowNum = 0
-    # events = []
+    events = []
     # e = {}
     for row in reader:
-      print(row)
-      print()
+      events.append(row)
   csvfile.close()
   return jsonify(events=events)
 
