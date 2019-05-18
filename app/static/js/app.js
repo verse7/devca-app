@@ -316,7 +316,9 @@ const ResourcePicker = Vue.component('resource-picker', {
   template: `
     <div>
       <h1>{{ type }}<h1>
-
+      <div v-if="isEmpty()">
+        No search results for {{ type }}s
+      </div>
     </div>
   `,
   props: ['type', 'resources'],
@@ -337,7 +339,7 @@ const ResourcePicker = Vue.component('resource-picker', {
           result.push(element);
         }
       });
-      this.filteredItems = result
+      this.filteredItems = result;
   }
 })
 
