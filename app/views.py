@@ -67,10 +67,9 @@ def register():
     lastname = form.lastname.data
     email = form.email.data
     password = form.password.data
-    photo = assignPath(form.photo.data)
 
     try:
-      user = User(firstname, lastname, email, password, photo)
+      user = User(firstname, lastname, email, password)
       db.session.add(user)
       db.session.commit()
 
