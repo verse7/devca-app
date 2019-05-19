@@ -14,7 +14,6 @@ class RegistrationForm(FlaskForm):
     lastname = StringField('Lastname', validators=[InputRequired()])
     email = EmailField('Email', validators=[InputRequired()])
     password = PasswordField('Password', validators=[InputRequired()])
-    photo = FileField('Photo', validators=[FileRequired(), FileAllowed(['png', 'jpg', 'jpeg'], 'Images Only!')])
 
 class GenericForm(FlaskForm):
     field1 = StringField('field1', validators=[InputRequired()])
