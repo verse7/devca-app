@@ -132,6 +132,9 @@ const Register = Vue.component('register', {
         <h4 class="font-weight-bold">Registration</h4>
       </div>
     </div>
+    <div class="alert alert-danger container pl-5 mt-5" role="alert" v-if="error">
+      {{ message }}
+    </div>
     <div class="container pl-5 mt-5">
       <form class="col-md-5" id="registerForm" method="post" @submit.prevent="register" enctype="multipart\form-data">
         <div class="form-group">
@@ -177,14 +180,25 @@ const Register = Vue.component('register', {
         return response.json();
       })
       .then(function (jsonResponse) {
-        if(jsonResponse.hasOwnProperty('message')){
-          router.push('/login');
+        if (jsonResponse.hasOwnProperty("error")){
+          self.error = true;
+          self.message = jsonResponse.error;
+        }else{
+          if(jsonResponse.hasOwnProperty('message')){
+            router.push({name: 'login', params: {notifs: jsonResponse.message, success: true}});
+          }
         }
       })
       .catch(function (error) {
         console.log(error);
       })
     }
+  },
+  data: function(){
+    return {
+      error: false,
+      message: ''
+   };
   }
 });
 
@@ -194,6 +208,14 @@ const Login = Vue.component('login', {
     <div class="d-flex justify-content-center bg-pattern" style="padding-top: 80px;">
       <div class="d-flex justify-content-start pb-3" style="width: 75%">
         <h4 class="font-weight-bold">Login</h4>
+      </div>
+    </div>
+    <div class="alert alert-danger container pl-5 mt-5" role="alert" v-if='error'>
+      {{ message }}
+    </div>
+    <div v-else>
+      <div class="alert alert-success container pl-5 mt-5" role="alert" v-if='success'>
+        {{ notifs }}
       </div>
     </div>
     <div class="container pl-5 mt-5">
@@ -231,7 +253,7 @@ const Login = Vue.component('login', {
       })
       .then(function (jsonResponse){
         console.log(jsonResponse);
-        if(jsonResponse.hasOwnProperty('message')){
+        if(jsonResponse.hasOwnProperty('token')){
           let jwt_token = jsonResponse.token;
           let id = jsonResponse.user_id;
 
@@ -240,12 +262,22 @@ const Login = Vue.component('login', {
           localStorage.setItem('current_user', id);
 
           router.push('/');
+        }else{
+          self.error = true;
+          self.message = jsonResponse.error;
         }
       })
       .catch(function (error){
         console.log(error);
       })
     }
+  },
+  props: ['notifs', 'success'],
+  data: function(){
+    return {
+      error: false,
+      message: ''
+    };
   }
 });
 
