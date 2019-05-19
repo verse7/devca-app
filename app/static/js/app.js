@@ -689,6 +689,7 @@ const ResourceDetails = Vue.component('resource-details', {
   },
   methods: {
     bookStay: function() {
+      let select = document.querySelector("select");
       if(localStorage.getItem('current_user') !== null){
         let bookingForm = new FormData();
         bookingForm.append("bookableId", this.resource.bookeableList[0].bookableId);
@@ -715,8 +716,11 @@ const ResourceDetails = Vue.component('resource-details', {
 				});
         
       }else{
-        alert("Must select a booking time from list before booking " + this.resource.type);
-        router.push('login');
+        if(select.length == 0){
+          alert("Must select a booking time from list before booking " + this.resource.type);
+        }else{
+          router.push('login');
+        }
       }
     }
   },
