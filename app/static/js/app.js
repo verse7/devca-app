@@ -336,7 +336,6 @@ const Itinerary = Vue.component('itinerary', {
 		<ul class="list-group" v-if="bookings.length">
 			<li v-for="booking in bookings" class="list-group-item">{{booking.idresource}}</li>
 		</ul>
-
 	`,
 	data: function() {
 		bookings: []
@@ -556,7 +555,7 @@ const ResourceDetails = Vue.component('resource-details', {
 						'content-type': 'application/json;charset=UTF-8',
           },
           credentials: 'same-origin'
-      })-
+      })
       .then(res => res.json())
       .then(jsonResp => {
           console.log(jsonResp);
@@ -574,7 +573,7 @@ const router = new VueRouter({
         {path: "/register", name: "register", component: Register, props: true},
         {path: "/results", name: "results", component: ResourcePicker, props: true},
 				{path: "/details", name: "details", component: ResourceDetails, props: true},
-				{path: "/itinerary", name:"itinerary", component: Itinerary, props: true},
+				{path: "/itinerary", name:"itinerary", component: Itinerary},
         // This is a catch all route in case none of the above matches
         {path: "*", component: NotFound}
     ]
