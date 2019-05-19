@@ -66,9 +66,9 @@ Vue.component('resource-card', {
   methods: {
     selectResource: function(){
 			console.log(this.resource.appId);
-			localStorage.setItem(this.type, JSON.stringify(this.resource));
+			// localStorage.setItem(this.type, JSON.stringify(this.resource));
 
-			console.log(JSON.parse(localStorage.getItem(this.type)));
+			// console.log(JSON.parse(localStorage.getItem(this.type)));
 			router.push({name:"details", params:{resource: this.resource}});
     }
   }
