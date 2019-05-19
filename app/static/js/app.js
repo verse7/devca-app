@@ -342,7 +342,7 @@ const ResourcePicker = Vue.component('resource-picker', {
 			</div>
 
 			<div class="modal fade" id="myModal" v-if="selectedResource !== null">
-				<div class="modal-dialog">
+				<div class="modal-dialog modal-lg">
 					<div class="modal-content">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -376,17 +376,12 @@ const ResourcePicker = Vue.component('resource-picker', {
 		}
   },
   created: function(){
-		let self = this;
-			// self.$route.params.resources.forEach(element => {
-			// 	if(self.filteredItems[element['__type']] != null){
-      //     self.filteredItems[element['__type']].push(element)
-      //   }
-			// });
-      self.resources.forEach(element => {
-        if(self.filteredItems[element['__type']] != null){
-          self.filteredItems[element['__type']].push(element)
-        }
-      });
+		let self = this;	
+		self.resources.forEach(element => {
+			if(self.filteredItems[element['__type']] != null){
+				self.filteredItems[element['__type']].push(element)
+			}
+		});
   }
 })
 
@@ -449,7 +444,7 @@ const ResourceDetails = Vue.component('resource-details', {
       })
       .then(res => res.json())
       .then(jsonResp => {
-          console.log(jsonResp)
+          console.log(jsonResp);
       });
     }
   }
