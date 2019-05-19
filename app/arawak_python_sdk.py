@@ -584,7 +584,7 @@ class Entities:
         """ Search using full text search
         """
         url = self.urlEntity + '/search?query=' + query
-        print url
+        print (url)
         return ExecuteQuery().Query(url,'GET')
 
 
@@ -1212,7 +1212,7 @@ class Media:
     def __init__(self):
         self.mediaURL = 'api.opencaribbean.org/api/v1/media/'    
     
-    def getMediaFile(filename):
+    def getMediaFile(self, filename):
         url = self.mediaURL + 'download/' + filename
         return ExecuteQuery().Query(url,'GET')
 
@@ -1227,7 +1227,7 @@ class ExecuteQuery:
     
     def Query(self,url,typeQuery,data=''):
         jsonData = json.dumps(data)
-        print jsonData
+        print (jsonData)
         try:
             if typeQuery == 'POST':
                 request = requests.post(url, headers=self.headers,data=jsonData)
