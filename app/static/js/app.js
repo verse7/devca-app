@@ -436,23 +436,32 @@ const NotFound = Vue.component('not-found', {
 const Itinerary = Vue.component('itinerary', {
 	template:`
 	<div>
-		<h2 class="mb-2">My Itinerary</h2>
-		<ul class="list-group" v-if="bookings.length">
-			<li v-for="booking in bookings" class="list-group-item">{{booking.idresource}}</li>
-		</ul>
+		<app-header></app-header>
+
+		<div class="mt-5 container">
+			<h2 class="mb-2">My Itinerary</h2>
+			<ul class="list-group" v-if="bookings.length">
+				<li v-for="booking in bookings" class="list-group-item">{{booking.name}}</li>
+			</ul>
+		</div>
 	</div>
 	`,
 	data: function() {
-		bookings: []
+		return {
+			bookings: []
+		}
 	},
 	methods: {
 
 	},
 	created: function(){
-			fetch('http://api.opencaribbean.org/api/v1/booking/bookings/history?iduser=' + localStorage.current_user)
-			.then( resp => resp.json()).then(jsonResp => {
-				this.bookings = jsonResp.content;
-			});
+
+		this.bookings = JSON.parse(localStorage.getItem('booked'));
+
+			// fetch('http://api.opencaribbean.org/api/v1/booking/bookings/history?iduser=' + localStorage.current_user)
+			// .then( resp => resp.json()).then(jsonResp => {
+			// 	this.bookings = jsonResp.content;
+			// });
 
 			// this.bookings.forEach(b => {
 			// 	fetch(`http://api.opencaribbean.org/api/v1/playtour/resource/${b.idresource}`)
@@ -675,11 +684,16 @@ const ResourceDetails = Vue.component('resource-details', {
   methods: {
     bookStay: function() {
 
-			// let resources = [];
-			// resources.push(this.resource);
-			// if (localStorage.getItem('resources') != null) {
-			// 	resourseArr
-			// }
+			let booked = [];
+			booked.push(this.resource);
+			if (localStorage.getItem('booked') != null) {
+				resourceArr = JSON.parse(localStorage.getItem('booked'));
+				resourceArr.push(this.resource);
+				localStorage.setItem('booked', JSON.stringify(resourceArr));
+			} else {
+				booked.push(this.resource);
+				localStorage.setItem('booked', JSON.stringify(booked));
+			}
 
 
 		if(localStorage.getItem('current_user') !== null){
