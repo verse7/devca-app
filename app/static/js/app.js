@@ -127,30 +127,36 @@ const Home = Vue.component('home', {
 const Register = Vue.component('register', {
   template: `
   <div>
-    <h4 class="font-weight-bold">Registration</h4>
-    <form id="registerForm" method="post" @submit.prevent="register" enctype="multipart\form-data">
-      <div class="form-group">
-        <label class="font-weight-bold">Firstname</label>
-        <input type="text" name="firstname" class="form-control">
+    <div class="d-flex justify-content-center bg-pattern" style="padding-top: 80px;">
+      <div class="d-flex justify-content-start pb-3" style="width: 75%">
+        <h4 class="font-weight-bold">Registration</h4>
       </div>
-      <div class="form-group">
-        <label class="font-weight-bold">Lastname</label>
-        <input type="text" name="lastname" class="form-control">
-      </div>
-      <div class="form-group">
-        <label class="font-weight-bold">Email</label>
-        <input type="email" name="email" placeholder="eg. johndoe@test.com" class="form-control">
-      </div>
-      <div class="form-group">
-        <label class="font-weight-bold">Password</label>
-        <input type="password" name="password" class="form-control">
-      </div>
-      <div class="form-group">
-        <label class="font-weight-bold">Photo</label>
-        <input type="file" name="photo" class="form-control-file">
-      </div>
-      <input type="submit" name="register" value="Submit" class="btn btn-primary">
-    </form>
+    </div>
+    <div class="container pl-5 mt-5">
+      <form class="col-md-5" id="registerForm" method="post" @submit.prevent="register" enctype="multipart\form-data">
+        <div class="form-group">
+          <label class="font-weight-bold">Firstname</label>
+          <input type="text" name="firstname" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="font-weight-bold">Lastname</label>
+          <input type="text" name="lastname" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="font-weight-bold">Email</label>
+          <input type="email" name="email" placeholder="eg. johndoe@test.com" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="font-weight-bold">Password</label>
+          <input type="password" name="password" class="form-control">
+        </div>
+        <div class="form-group pb-3">
+          <label class="font-weight-bold">Photo</label>
+          <input type="file" name="photo" class="form-control-file">
+        </div>
+        <input type="submit" name="register" value="Submit" class="btn btn-primary btn-block mb-3">
+      </form>
+    </div>
   </div>
   `,
   methods: {
@@ -480,7 +486,7 @@ const ResourcePicker = Vue.component('resource-picker', {
     this.start = self.months[s.getMonth()]+" "+(s.getDate()+1)+", "+s.getFullYear();
     this.end = self.months[e.getMonth()]+" "+(e.getDate()+1)+", "+e.getFullYear();
   }
-})
+});
 
 const ResourceDetails = Vue.component('resource-details', {
   template: `
@@ -542,6 +548,9 @@ const ResourceDetails = Vue.component('resource-details', {
       .then(res => res.json())
       .then(jsonResp => {
           console.log(jsonResp);
+      })
+      .catch(function(err){
+        console.log(err);
       });
     }
   }
