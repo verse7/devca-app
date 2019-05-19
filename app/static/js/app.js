@@ -10,19 +10,30 @@ Vue.component('app-header', {
           <li class="nav-item active">
             <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="!logged">
             <router-link class="nav-link" to="/register">Register</router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="!logged">
             <router-link class="nav-link" to="/login">Login</router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="logged">
             <router-link class="nav-link" to="/calendar">Calendar</router-link>
+          </li>
+          <li class="nav-item" v-if="logged">
+            <router-link class="nav-link" to="/logout">Logout</router-link>
           </li>
         </ul>
       </div>
     </nav>
-    `
+    `,
+    created: function() {
+      this.logged = localStorage.getItem('current_user') !== null;
+    },
+    data: function(){
+      return {
+        logged: false
+      }
+    }
 });
 
 Vue.component('app-footer', {
@@ -111,22 +122,33 @@ Vue.component('default-listing', {
 	});
 
 const Home = Vue.component('home', {
-    template: `
-    <div>
-      <div class="bg-pattern mb-4">
-        <search></search>
+  template: `
+  <div>
+    <app-header></app-header>
+    <div class="bg-pattern mb-4">
+      <div role="alert" v-if='success' style="padding: 50px 0 0 80px;">
+        <div class="alert alert-success col-md-7">
+          {{ notifs }}
+        </div>
       </div>
-      <div class="container">
-        <default-listing title="Hotels" type="HOTEL"></default-listing>
-        <default-listing title="Vill" type="MOTEL"></default-listing>
-      </div>
+      <search></search>
     </div>
-    `
+    <div class="container">
+      <default-listing title="Hotels" type="HOTEL"></default-listing>
+      <default-listing title="Vill" type="MOTEL"></default-listing>
+    </div>
+  </div>
+  `,
+  props: ['notifs', 'success'],
+  data: function() {
+    return {};
+  }
 });
 
 const Register = Vue.component('register', {
   template: `
   <div>
+    <app-header></app-header>
     <div class="d-flex justify-content-center bg-pattern" style="padding-top: 80px;">
       <div class="d-flex justify-content-start pb-3" style="width: 75%">
         <h4 class="font-weight-bold">Registration</h4>
@@ -205,6 +227,7 @@ const Register = Vue.component('register', {
 const Login = Vue.component('login', {
   template: `
   <div>
+    <app-header></app-header>
     <div class="d-flex justify-content-center bg-pattern" style="padding-top: 80px;">
       <div class="d-flex justify-content-start pb-3" style="width: 75%">
         <h4 class="font-weight-bold">Login</h4>
@@ -278,6 +301,16 @@ const Login = Vue.component('login', {
       error: false,
       message: ''
     };
+  }
+});
+
+const Logout = Vue.component('logout', {
+  template:`<div></div>`,
+  created: function(){
+    let message;
+    localStorage.clear();
+    message = "User successfully logged out";
+    router.push({name: 'home', params:{notifs: message, success: true}});
   }
 });
 
@@ -377,6 +410,7 @@ const NotFound = Vue.component('not-found', {
 const Calendar = Vue.component('calendar' , {
   template: `
   <div class="calendar">
+    <app-header></app-header>
     <div class="month">
       <ul>
         <li class="prev"><ion-icon name="arrow-dropleft"></ion-icon></li>
@@ -453,6 +487,7 @@ const Calendar = Vue.component('calendar' , {
 const ResourcePicker = Vue.component('resource-picker', {
 	template: `
     <div>
+      <app-header></app-header>
       <div class="bg-pattern">
         <div style="padding: 80px 0 30px 80px;">
           <p class="font-weight-bold"> Search Results Below </p>
@@ -547,7 +582,7 @@ const ResourceDetails = Vue.component('resource-details', {
         </div>
         <p class="card-text">{{ resource.description }}</p>
          <h4 class="font-weight-bold pr-5 pb-4">Select {{ resource.__type }}: </h4>
-         <button @click="bookStay" class="btn btn-dark btn-size pl-5 mb-4 d-flex align-items-center" type="submit">Book</button>
+         <button @click="bookStay" class="btn btn-dark btn-size pl-5 mb-4 d-flex align-items-center" type="submit" data-dismiss="modal">Book</button>
       </div>
     </div>
     <div class="container">
@@ -568,28 +603,32 @@ const ResourceDetails = Vue.component('resource-details', {
   },
   methods: {
     bookStay: function() {
-      let bookingForm = new FormData();
-      bookingForm.append("bookableId", this.resource.bookeableList[0].bookableId);
-      bookingForm.append("dateend", localStorage.endDate);
-      bookingForm.append("datestart", localStorage.startDate);
-      bookingForm.append("idapp", this.resource.appId);
-      bookingForm.append("idresource", this.resource.id);
-      bookingForm.append("iduser", localStorage.getItem('current_user'));
-      bookingForm.append("status", "CREATED");
-
-
-      fetch('https://api.opencaribbean.org/api/v1/booking/bookings', {
-          method: 'POST', 
-          body: bookingForm,
-          credentials: 'same-origin'
-      })
-      .then(res => res.json())
-      .then(jsonResp => {
-          console.log(jsonResp);
-      })
-      .catch(function(err){
-        console.log(err);
-      });
+      if(localStorage.getItem('current_user') !== null){
+        let bookingForm = new FormData();
+        bookingForm.append("bookableId", this.resource.bookeableList[0].bookableId);
+        bookingForm.append("dateend", localStorage.endDate);
+        bookingForm.append("datestart", localStorage.startDate);
+        bookingForm.append("idapp", this.resource.appId);
+        bookingForm.append("idresource", this.resource.id);
+        bookingForm.append("iduser", localStorage.getItem('current_user'));
+        bookingForm.append("status", "CREATED");
+  
+  
+        fetch('https://api.opencaribbean.org/api/v1/booking/bookings', {
+            method: 'POST', 
+            body: bookingForm,
+            credentials: 'same-origin'
+        })
+        .then(res => res.json())
+        .then(jsonResp => {
+            console.log(jsonResp);
+        })
+        .catch(function(err){
+          console.log(err);
+        });
+      }else{
+        router.push('/login');
+      }
     }
   }
 });
@@ -600,6 +639,7 @@ const router = new VueRouter({
         {path: "/", name: "home", component: Home, props: true},
         {path: "/calendar", component: Calendar},
         {path: "/login", name: "login", component: Login, props: true},
+        {path: "/logout", component: Logout},
         {path: "/register", name: "register", component: Register, props: true},
         {path: "/results", component: ResourcePicker},
         {path: "/details", name: "details", component: ResourceDetails, props: true},
