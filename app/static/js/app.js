@@ -38,22 +38,33 @@ Vue.component('app-header', {
           <li class="nav-item">
             <router-link class="nav-link" to="/explore">Explore</router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="!logged">
             <router-link class="nav-link" to="/register">Register</router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="!logged">
             <router-link class="nav-link" to="/login">Login</router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="logged">
             <router-link class="nav-link" to="/calendar">Calendar</router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="logged">
             <router-link class="nav-link" to="/itinerary">Itinerary</router-link>
+          </li>
+          <li class="nav-item" v-if="logged">
+            <router-link class="nav-link" to="/logout">Logout</router-link>
           </li>
         </ul>
       </div>
     </nav>
-    `
+    `,
+    created: function() {
+      this.logged = localStorage.getItem('current_user') !== null;
+    },
+    data: function(){
+      return {
+        logged: false
+      }
+    }
 });
 
 Vue.component('app-footer', {
@@ -141,54 +152,66 @@ Vue.component('default-listing', {
 	});
 
 const Home = Vue.component('home', {
-    template: `
-    <div>
-			<div class="bg-pattern mb-4">
-				<search></search>
-			</div>
-			<div class="container">
-				<default-listing title="Hotels" type="HOTEL"></default-listing>
-				<default-listing title="Vill" type="MOTEL"></default-listing>
-			</div>
-		</div>
-    `,
-    data: function(){
-      return {
-        resources: []
-      }
-    },
-    created: function(){
-
-    }
+  template: `
+  <div>
+    <app-header></app-header>
+    <div class="bg-pattern mb-4">
+      <div role="alert" v-if='success' style="padding: 50px 0 0 80px;">
+        <div class="alert alert-success col-md-7">
+          {{ notifs }}
+        </div>
+      </div>
+      <search></search>
+    </div>
+    <div class="container">
+      <default-listing title="Hotels" type="HOTEL"></default-listing>
+      <default-listing title="Vill" type="MOTEL"></default-listing>
+    </div>
+  </div>
+  `,
+  props: ['notifs', 'success'],
+  data: function() {
+    return {};
+  }
 });
 
 const Register = Vue.component('register', {
   template: `
   <div>
-    <h4 class="font-weight-bold">Registration</h4>
-    <form id="registerForm" method="post" @submit.prevent="register" enctype="multipart\form-data">
-      <div class="form-group">
-        <label class="font-weight-bold">Firstname</label>
-        <input type="text" name="firstname" class="form-control">
+    <app-header></app-header>
+    <div class="d-flex justify-content-center bg-pattern" style="padding-top: 80px;">
+      <div class="d-flex justify-content-start pb-3" style="width: 75%">
+        <h4 class="font-weight-bold">Registration</h4>
       </div>
-      <div class="form-group">
-        <label class="font-weight-bold">Lastname</label>
-        <input type="text" name="lastname" class="form-control">
-      </div>
-      <div class="form-group">
-        <label class="font-weight-bold">Email</label>
-        <input type="email" name="email" placeholder="eg. johndoe@test.com" class="form-control">
-      </div>
-      <div class="form-group">
-        <label class="font-weight-bold">Password</label>
-        <input type="password" name="password" class="form-control">
-      </div>
-      <div class="form-group">
-        <label class="font-weight-bold">Photo</label>
-        <input type="file" name="photo" class="form-control-file">
-      </div>
-      <input type="submit" name="register" value="Submit" class="btn btn-primary">
-    </form>
+    </div>
+    <div class="alert alert-danger container pl-5 mt-5" role="alert" v-if="error">
+      {{ message }}
+    </div>
+    <div class="container pl-5 mt-5">
+      <form class="col-md-5" id="registerForm" method="post" @submit.prevent="register" enctype="multipart\form-data">
+        <div class="form-group">
+          <label class="font-weight-bold">Firstname</label>
+          <input type="text" name="firstname" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="font-weight-bold">Lastname</label>
+          <input type="text" name="lastname" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="font-weight-bold">Email</label>
+          <input type="email" name="email" placeholder="eg. johndoe@test.com" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="font-weight-bold">Password</label>
+          <input type="password" name="password" class="form-control">
+        </div>
+        <div class="form-group pb-3">
+          <label class="font-weight-bold">Photo</label>
+          <input type="file" name="photo" class="form-control-file">
+        </div>
+        <input type="submit" name="register" value="Submit" class="btn btn-primary btn-block font-weight-bold">
+      </form>
+    </div>
   </div>
   `,
   methods: {
@@ -209,32 +232,58 @@ const Register = Vue.component('register', {
         return response.json();
       })
       .then(function (jsonResponse) {
-        if(jsonResponse.hasOwnProperty('message')){
-          router.push('/login');
+        if (jsonResponse.hasOwnProperty("error")){
+          self.error = true;
+          self.message = jsonResponse.error;
+        }else{
+          if(jsonResponse.hasOwnProperty('message')){
+            router.push({name: 'login', params: {notifs: jsonResponse.message, success: true}});
+          }
         }
       })
       .catch(function (error) {
         console.log(error);
       })
     }
+  },
+  data: function(){
+    return {
+      error: false,
+      message: ''
+   };
   }
 });
 
 const Login = Vue.component('login', {
   template: `
   <div>
-    <h4 class="font-weight-bold">Login</h4>
-    <form id="loginForm" method="post" @submit.prevent="login">
-      <div class="form-group">
-        <label class="font-weight-bold">Email</label>
-        <input type="email" class="form-control" name="email" placeholder="johndoe@test.com">
+    <app-header></app-header>
+    <div class="d-flex justify-content-center bg-pattern" style="padding-top: 80px;">
+      <div class="d-flex justify-content-start pb-3" style="width: 75%">
+        <h4 class="font-weight-bold">Login</h4>
       </div>
-      <div class="form-group">
-        <label class="font-weight-bold">Password</label>
-        <input type="password" class="form-control" name="password">
+    </div>
+    <div class="alert alert-danger container pl-5 mt-5" role="alert" v-if='error'>
+      {{ message }}
+    </div>
+    <div v-else>
+      <div class="alert alert-success container pl-5 mt-5" role="alert" v-if='success'>
+        {{ notifs }}
       </div>
-      <input type="submit" value="Login" class="btn btn-primary font-weight-bold">
-    </form>
+    </div>
+    <div class="container pl-5 mt-5">
+      <form class="col-md-5" id="registerForm" id="loginForm" method="post" @submit.prevent="login">
+        <div class="form-group">
+          <label class="font-weight-bold">Email</label>
+          <input type="email" class="form-control" name="email" placeholder="johndoe@test.com">
+        </div>
+        <div class="form-group">
+          <label class="font-weight-bold">Password</label>
+          <input type="password" class="form-control" name="password">
+        </div>
+        <input type="submit" value="Login" class="btn btn-primary btn-block font-weight-bold">
+      </form>
+    </div>
   </div>
   `,
   methods: {
@@ -257,7 +306,7 @@ const Login = Vue.component('login', {
       })
       .then(function (jsonResponse){
         console.log(jsonResponse);
-        if(jsonResponse.hasOwnProperty('message')){
+        if(jsonResponse.hasOwnProperty('token')){
           let jwt_token = jsonResponse.token;
           let id = jsonResponse.user_id;
 
@@ -266,12 +315,32 @@ const Login = Vue.component('login', {
           localStorage.setItem('current_user', id);
 
           router.push('/');
+        }else{
+          self.error = true;
+          self.message = jsonResponse.error;
         }
       })
       .catch(function (error){
         console.log(error);
       })
     }
+  },
+  props: ['notifs', 'success'],
+  data: function(){
+    return {
+      error: false,
+      message: ''
+    };
+  }
+});
+
+const Logout = Vue.component('logout', {
+  template:`<div></div>`,
+  created: function(){
+    let message;
+    localStorage.clear();
+    message = "User successfully logged out";
+    router.push({name: 'home', params:{notifs: message, success: true}});
   }
 });
 
@@ -402,6 +471,7 @@ const Itinerary = Vue.component('itinerary', {
 const Calendar = Vue.component('calendar' , {
   template: `
   <div class="calendar">
+    <app-header></app-header>
     <div class="month">
       <ul>
         <li class="prev"><ion-icon name="arrow-dropleft" @click="subtractMonth"></ion-icon></li>
@@ -478,6 +548,7 @@ const Calendar = Vue.component('calendar' , {
 const ResourcePicker = Vue.component('resource-picker', {
 	template: `
     <div>
+      <app-header></app-header>
       <div class="bg-pattern">
         <div style="padding: 80px 0 30px 80px;">
           <p class="font-weight-bold"> Search Results Below </p>
@@ -549,7 +620,7 @@ const ResourcePicker = Vue.component('resource-picker', {
     this.start = self.months[s.getMonth()]+" "+(s.getDate()+1)+", "+s.getFullYear();
     this.end = self.months[e.getMonth()]+" "+(e.getDate()+1)+", "+e.getFullYear();
   }
-})
+});
 
 const ResourceDetails = Vue.component('resource-details', {
   template: `
@@ -573,15 +644,14 @@ const ResourceDetails = Vue.component('resource-details', {
         <p class="card-text">{{ resource.description }}</p>
 
         <!-- BOOKING LIST HERE -->
-        <div class="form">
+        <div class="form pb-3">
           <label for="book-sel">Select Booking Period: </label>
           <select class="form-control" id="book-sel" v-model="selBooking">
             <option v-for="bookable in bookables" :value="bookable">{{ new Date(bookable.dateStart).toUTCString() }} --> {{ new Date(bookable.dateEnd).toUTCString() }}</option>
           </select> 
         </div>
         
-         <button @click="bookStay" class="btn btn-dark btn-size pl-5 mb-4 d-flex align-items-center" type="submit">Book</button>
-         Selected value is : {{ selBooking }}
+         <button @click="bookStay" class="btn btn-dark btn-size pl-5 mb-4 d-flex align-items-center" type="submit" data-dismiss="modal">Book</button>
       </div>
     </div>
     <div class="container">
@@ -608,9 +678,9 @@ const ResourceDetails = Vue.component('resource-details', {
   },
   methods: {
     bookStay: function() {
-      if(this.selBooking != null){
+      if(localStorage.getItem('current_user') !== null){
         let bookingForm = new FormData();
-        bookingForm.append("bookableId", this.selBooking.bookableId);
+        bookingForm.append("bookableId", this.resource.bookeableList[0].bookableId);
         bookingForm.append("dateend", localStorage.endDate);
         bookingForm.append("datestart", localStorage.startDate);
         bookingForm.append("idapp", this.resource.appId);
@@ -807,6 +877,7 @@ const router = new VueRouter({
         {path: "/", name: "home", component: Home, props: true},
         {path: "/calendar", component: Calendar},
         {path: "/login", name: "login", component: Login, props: true},
+        {path: "/logout", component: Logout},
         {path: "/register", name: "register", component: Register, props: true},
         {path: "/results", name: "results", component: ResourcePicker, props: true},
 				{path: "/details", name: "details", component: ResourceDetails, props: true},
