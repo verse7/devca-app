@@ -617,7 +617,7 @@ const ResourceDetails = Vue.component('resource-details', {
         <p class="card-text">{{ resource.description }}</p>
 
         <!-- BOOKING LIST HERE -->
-        <div class="form">
+        <div class="form pb-3">
           <label for="book-sel">Select Booking Period: </label>
           <select class="form-control" id="book-sel" v-model="selBooking">
             <option v-for="bookable in bookables" :value="bookable">{{ new Date(bookable.dateStart).toUTCString() }} --> {{ new Date(bookable.dateEnd).toUTCString() }}</option>
@@ -625,7 +625,6 @@ const ResourceDetails = Vue.component('resource-details', {
         </div>
         
          <button @click="bookStay" class="btn btn-dark btn-size pl-5 mb-4 d-flex align-items-center" type="submit" data-dismiss="modal">Book</button>
-         Selected value is : {{ selBooking }}
       </div>
     </div>
     <div class="container">
