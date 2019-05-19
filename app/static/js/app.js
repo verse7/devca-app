@@ -744,12 +744,11 @@ const ResourceDetails = Vue.component('resource-details', {
         }
       }
     }
-  	},
-		created: function(){
-			this.bookables = this.resource.bookeableList;
-			console.log(this.bookables);
-		}      
-	}
+	},
+	created: function(){
+		this.bookables = this.resource.bookeableList;
+		console.log(this.bookables);
+	}      
 });
 
 const ExploreMapFooter = Vue.component('map-footer', {
