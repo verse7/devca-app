@@ -697,6 +697,9 @@ const ResourceDetails = Vue.component('resource-details', {
         resourceArr = JSON.parse(localStorage.getItem('booked'));
         resourceArr.push(this.resource);
         localStorage.setItem('booked', JSON.stringify(booked));
+      } else {
+        booked.push(this.resource);
+        localStorage.setItem('booked', JSON.stringify(booked));
       }
 
       if(localStorage.getItem('current_user') !== null){
