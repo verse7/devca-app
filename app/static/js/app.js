@@ -20,6 +20,9 @@ Vue.component('app-header', {
             <router-link class="nav-link" to="/calendar">Calendar</router-link>
           </li>
           <li class="nav-item" v-if="logged">
+            <router-link class="nav-link" to="/itinerary">Itinerary</router-link>
+          </li>
+          <li class="nav-item" v-if="logged">
             <router-link class="nav-link" to="/logout">Logout</router-link>
           </li>
         </ul>
@@ -56,7 +59,7 @@ Vue.component('app-footer', {
           </router-link>
         </li>
         <li>
-          <router-link to="/profile">
+          <router-link to="/itinerary">
             <ion-icon class="text-dark tab-icon" name="person"></ion-icon>
           </router-link>
         </li>
@@ -407,14 +410,45 @@ const NotFound = Vue.component('not-found', {
     }
 })
 
+const Itinerary = Vue.component('itinerary', {
+	template:`
+	<div>
+		<h2 class="mb-2">My Itinerary</h2>
+		<ul class="list-group" v-if="bookings.length">
+			<li v-for="booking in bookings" class="list-group-item">{{booking.idresource}}</li>
+		</ul>
+	</div>
+	`,
+	data: function() {
+		bookings: []
+	},
+	methods: {
+
+	},
+	created: function(){
+			fetch('http://api.opencaribbean.org/api/v1/booking/bookings/history?iduser=' + localStorage.current_user)
+			.then( resp => resp.json()).then(jsonResp => {
+				this.bookings = jsonResp.content;
+			});
+
+			// this.bookings.forEach(b => {
+			// 	fetch(`http://api.opencaribbean.org/api/v1/playtour/resource/${b.idresource}`)
+			// 	.then( resp => resp.json()).then(jsonResp => {
+			// 		console.log(`supposed resources ${jsonResp.content}`);
+			// 		b.name = jsonResp.content.name;
+			// 	});
+			// }) ;
+	}
+});
+
 const Calendar = Vue.component('calendar' , {
   template: `
   <div class="calendar">
     <app-header></app-header>
     <div class="month">
       <ul>
-        <li class="prev"><ion-icon name="arrow-dropleft"></ion-icon></li>
-        <li class="next"><ion-icon name="arrow-dropright"></ion-icon></li>
+        <li class="prev"><ion-icon name="arrow-dropleft" @click="subtractMonth"></ion-icon></li>
+        <li class="next"><ion-icon name="arrow-dropright" @click="addMonth"></ion-icon></li>
         <li>{{ month }}<br><span style="font-size:18px">{{year}}</span></li>
       </ul>
     </div>
@@ -581,8 +615,17 @@ const ResourceDetails = Vue.component('resource-details', {
           </div>
         </div>
         <p class="card-text">{{ resource.description }}</p>
-         <h4 class="font-weight-bold pr-5 pb-4">Select {{ resource.__type }}: </h4>
+
+        <!-- BOOKING LIST HERE -->
+        <div class="form">
+          <label for="book-sel">Select Booking Period: </label>
+          <select class="form-control" id="book-sel" v-model="selBooking">
+            <option v-for="bookable in bookables" :value="bookable">{{ new Date(bookable.dateStart).toUTCString() }} --> {{ new Date(bookable.dateEnd).toUTCString() }}</option>
+          </select> 
+        </div>
+        
          <button @click="bookStay" class="btn btn-dark btn-size pl-5 mb-4 d-flex align-items-center" type="submit" data-dismiss="modal">Book</button>
+         Selected value is : {{ selBooking }}
       </div>
     </div>
     <div class="container">
@@ -601,6 +644,12 @@ const ResourceDetails = Vue.component('resource-details', {
   created: function(){
     console.log(this.resource);
   },
+  data: function(){
+    return{
+      bookables: [],
+      selBooking: null
+    }
+  },
   methods: {
     bookStay: function() {
       if(localStorage.getItem('current_user') !== null){
@@ -612,25 +661,31 @@ const ResourceDetails = Vue.component('resource-details', {
         bookingForm.append("idresource", this.resource.id);
         bookingForm.append("iduser", localStorage.getItem('current_user'));
         bookingForm.append("status", "CREATED");
-  
-  
-        fetch('https://api.opencaribbean.org/api/v1/booking/bookings', {
-            method: 'POST', 
-            body: bookingForm,
-            credentials: 'same-origin'
-        })
-        .then(res => res.json())
-        .then(jsonResp => {
-            console.log(jsonResp);
-        })
-        .catch(function(err){
-          console.log(err);
-        });
+
+
+				fetch('https://api.opencaribbean.org/api/v1/booking/bookings', {
+						method: 'POST', 
+						body: bookingForm,
+						headers: {
+							'X-CSRFToken': token,
+							'content-type': 'application/json;charset=UTF-8',
+						},
+						credentials: 'same-origin'
+				})
+				.then(res => res.json())
+				.then(jsonResp => {
+						console.log(jsonResp);
+				});
+        
       }else{
-        router.push('/login');
+        alert("Must select a booking time from list before booking " + this.resource.type);
       }
     }
-  }
+  },
+  created: function(){
+    this.bookables = this.resource.bookeableList;
+    console.log(this.bookables);
+  }      
 });
 
 const router = new VueRouter({
@@ -641,8 +696,9 @@ const router = new VueRouter({
         {path: "/login", name: "login", component: Login, props: true},
         {path: "/logout", component: Logout},
         {path: "/register", name: "register", component: Register, props: true},
-        {path: "/results", component: ResourcePicker},
-        {path: "/details", name: "details", component: ResourceDetails, props: true},
+        {path: "/results", name: "results", component: ResourcePicker, props: true},
+				{path: "/details", name: "details", component: ResourceDetails, props: true},
+				{path: "/itinerary", name:"itinerary", component: Itinerary},
         // This is a catch all route in case none of the above matches
         {path: "*", component: NotFound}
     ]
