@@ -671,7 +671,7 @@ const ResourceDetails = Vue.component('resource-details', {
           </select> 
         </div>
         <br>
-         <button @click="bookStay" class="btn btn-dark btn-size pl-5 mb-4 d-flex align-items-center" type="submit" data-dismiss="modal">Book</button>
+         <button @click="bookStay" style="display:block;" class="btn btn-dark btn-size pl-5 mb-4 d-flex align-items-center" type="submit" data-dismiss="modal">Book</button>
       </div>
     </div>
     <div class="container">
