@@ -449,34 +449,29 @@ const NotFound = Vue.component('not-found', {
 })
 
 const Itinerary = Vue.component('itinerary', {
-	template:`
-	<div>
-		<h2 class="mb-2">My Itinerary</h2>
-		<ul class="list-group" v-if="bookings.length">
-			<li v-for="booking in bookings" class="list-group-item">{{booking.idresource}}</li>
-		</ul>
-	</div>
-	`,
-	data: function() {
-		bookings: []
-	},
-	methods: {
+  template:
+  `
+  <div>
+      <app-header></app-header>
 
-	},
-	created: function(){
-			fetch('https://api.opencaribbean.org/api/v1/booking/bookings/history?iduser=' + localStorage.current_user)
-			.then( resp => resp.json()).then(jsonResp => {
-				this.bookings = jsonResp.content;
-			});
-
-			// this.bookings.forEach(b => {
-			// 	fetch(`http://api.opencaribbean.org/api/v1/playtour/resource/${b.idresource}`)
-			// 	.then( resp => resp.json()).then(jsonResp => {
-			// 		console.log(`supposed resources ${jsonResp.content}`);
-			// 		b.name = jsonResp.content.name;
-			// 	});
-			// }) ;
-	}
+      <div class="mt-5 container">
+          <h2 class="mb-2">My Itinerary</h2>
+          <ul class="list-group" v-if="bookings.length">
+              <li v-for="booking in bookings" class="list-group-item">{{booking.name}}</li>
+          </ul>
+      </div>
+  </div>`
+  ,
+  data: function() {
+      return {
+          bookings: []
+      }
+  },
+  methods: {
+  },
+  created: function(){
+      this.bookings = JSON.parse(localStorage.getItem('booked'));
+  }
 });
 
 const Calendar = Vue.component('calendar' , {
