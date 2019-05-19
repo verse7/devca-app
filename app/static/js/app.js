@@ -121,7 +121,7 @@ const Home = Vue.component('home', {
 			</div>
 			<div class="container">
 				<default-listing title="Hotels" type="HOTEL"></default-listing>
-				<default-listing title="Vill" type="MOTEL"></default-listing>
+				<default-listing title="Villas" type="MOTEL"></default-listing>
 			</div>
 		</div>
     `,
@@ -581,6 +581,14 @@ const ResourceDetails = Vue.component('resource-details', {
   },
   methods: {
     bookStay: function() {
+
+			// let resources = [];
+			// resources.push(this.resource);
+			// if (localStorage.getItem('resources') != null) {
+			// 	resourseArr
+			// }
+
+
       if(this.selBooking != null){
         let bookingForm = new FormData();
         bookingForm.append("bookableId", this.selBooking.bookableId);
