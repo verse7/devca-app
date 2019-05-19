@@ -116,7 +116,7 @@ Vue.component('resource-card', {
 	<div>
 		<div class="card mr-4 bg-transparent text-dark" > 
 			<img class="card-img img-fluid"
-					:src="'http://api.opencaribbean.org/api/v1/media/download/' + resource.mainImage">
+					:src="'https://api.opencaribbean.org/api/v1/media/download/' + resource.mainImage">
 			<small class="mt-1 font-weight-bold">{{ resource.name }}</small>
 		</div>
 		
@@ -152,7 +152,7 @@ Vue.component('default-listing', {
   created: function() {
       let self = this;
 
-      fetch('http://api.opencaribbean.org/api/v1/playtour/resource/search?query=' + self.type, {
+      fetch('https://api.opencaribbean.org/api/v1/playtour/resource/search?query=' + self.type, {
         method: 'GET',
         credentials: 'same-origin'
       })
@@ -416,7 +416,7 @@ const Search = Vue.component('search', {
 			localStorage.setItem('startDate', s);
 			localStorage.setItem('endDate', e);
       
-      fetch('http://api.opencaribbean.org/api/v1/playtour/resource/page/availables?countryId='+ self.countryId +'&startDate='+ s +'&endDate='+ e +'&onlybookable=true&page=0&size=100', {
+      fetch('https://api.opencaribbean.org/api/v1/playtour/resource/page/availables?countryId='+ self.countryId +'&startDate='+ s +'&endDate='+ e +'&onlybookable=true&page=0&size=100', {
         method: 'GET'
       })
       .then(function (response) {
@@ -575,7 +575,7 @@ const ResourcePicker = Vue.component('resource-picker', {
           <h4 class="font-weight-bold"> Avaible Bookings: {{ start }} - {{ end }} </h4>
         </div>
       </div>
-			<div class="container" style="margin-top: 80px;">
+			<div class="container mt-4">
 				<div class="card shadow-sm p-4 mb-5 rounded" v-for="category in Object.entries(filteredItems)" style="width: 100%">
 					<h4 class="font-weight-bold">{{ category[0] }}</h4>
 					<div v-if="category[1].length" class="scrolling-wrapper pt-3">
@@ -648,7 +648,7 @@ const ResourceDetails = Vue.component('resource-details', {
     <div class="card mb-3 pl-5 pr-5 bg-pattern" style="width: 100%;">
       <div class="row no-gutters" style="padding: 80px 0 0 20px;">
         <div class="col-md-4 pb-5">
-          <img :src="'http://api.opencaribbean.org/api/v1/media/download/' + resource.mainImage" class="card-img" alt="Image of resource"
+          <img :src="'https://api.opencaribbean.org/api/v1/media/download/' + resource.mainImage" class="card-img" alt="Image of resource"
           style="width: 90%; height: 100%;">
         </div>
         <div class="col-md-8 pb-5">
@@ -678,7 +678,7 @@ const ResourceDetails = Vue.component('resource-details', {
       <ul class="row list-inline">
         <li class="col-sm-4" v-for="photo in resource.images">
           <div class="card-body">
-            <img :src="'http://api.opencaribbean.org/api/v1/media/download/' + photo" alt="Additional Images of the resource" 
+            <img :src="'https://api.opencaribbean.org/api/v1/media/download/' + photo" alt="Additional Images of the resource" 
             class="img-fluid card-img-top">
           </div>
         </li>
@@ -892,7 +892,7 @@ const Explore = Vue.component('explore', {
           L.marker([resource._Location_latitude, resource._Location_longitude])
           .bindPopup(`
           <div style="width: 150px;">
-            <!-- <img src="api.opencaribbean.org/api/v1/media/download/${resource.Images}" class="card-img-top" alt="..."> -->
+            <!-- <img src="https://api.opencaribbean.org/api/v1/media/download/${resource.Images}" class="card-img-top" alt="..."> -->
             <div class="card-body p-0">
               <h5 class="card-title">${resource.Name}</h5>
               <p class="card-text">${resource.Description}</p>
