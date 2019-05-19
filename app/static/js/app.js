@@ -116,7 +116,7 @@ Vue.component('resource-card', {
 	<div>
 		<div class="card mr-4 bg-transparent text-dark" > 
 			<img class="card-img img-fluid"
-					:src="'http://api.opencaribbean.org/api/v1/media/download/' + resource.mainImage">
+					:src="'https://api.opencaribbean.org/api/v1/media/download/' + resource.mainImage">
 			<small class="mt-1 font-weight-bold">{{ resource.name }}</small>
 		</div>
 		
@@ -152,7 +152,7 @@ Vue.component('default-listing', {
   created: function() {
       let self = this;
 
-      fetch('http://api.opencaribbean.org/api/v1/playtour/resource/search?query=' + self.type, {
+      fetch('https://api.opencaribbean.org/api/v1/playtour/resource/search?query=' + self.type, {
         method: 'GET',
         credentials: 'same-origin'
       })
@@ -180,7 +180,7 @@ const Home = Vue.component('home', {
     </div>
     <div class="container">
       <default-listing title="Hotels" type="HOTEL"></default-listing>
-      <default-listing title="Vill" type="MOTEL"></default-listing>
+      <default-listing title="Motels" type="MOTEL"></default-listing>
     </div>
   </div>
   `,
@@ -416,7 +416,7 @@ const Search = Vue.component('search', {
 			localStorage.setItem('startDate', s);
 			localStorage.setItem('endDate', e);
       
-      fetch('http://api.opencaribbean.org/api/v1/playtour/resource/page/availables?countryId='+ self.countryId +'&startDate='+ s +'&endDate='+ e +'&onlybookable=true&page=0&size=100', {
+      fetch('https://api.opencaribbean.org/api/v1/playtour/resource/page/availables?countryId='+ self.countryId +'&startDate='+ s +'&endDate='+ e +'&onlybookable=true&page=0&size=100', {
         method: 'GET'
       })
       .then(function (response) {
@@ -451,23 +451,32 @@ const NotFound = Vue.component('not-found', {
 const Itinerary = Vue.component('itinerary', {
 	template:`
 	<div>
-		<h2 class="mb-2">My Itinerary</h2>
-		<ul class="list-group" v-if="bookings.length">
-			<li v-for="booking in bookings" class="list-group-item">{{booking.idresource}}</li>
-		</ul>
+		<app-header></app-header>
+
+		<div class="mt-5 container">
+			<h2 class="mb-2">My Itinerary</h2>
+			<ul class="list-group" v-if="bookings.length">
+				<li v-for="booking in bookings" class="list-group-item">{{booking.name}}</li>
+			</ul>
+		</div>
 	</div>
 	`,
 	data: function() {
-		bookings: []
+		return {
+			bookings: []
+		}
 	},
 	methods: {
 
 	},
 	created: function(){
-			fetch('http://api.opencaribbean.org/api/v1/booking/bookings/history?iduser=' + localStorage.current_user)
-			.then( resp => resp.json()).then(jsonResp => {
-				this.bookings = jsonResp.content;
-			});
+
+		this.bookings = JSON.parse(localStorage.getItem('booked'));
+
+			// fetch('http://api.opencaribbean.org/api/v1/booking/bookings/history?iduser=' + localStorage.current_user)
+			// .then( resp => resp.json()).then(jsonResp => {
+			// 	this.bookings = jsonResp.content;
+			// });
 
 			// this.bookings.forEach(b => {
 			// 	fetch(`http://api.opencaribbean.org/api/v1/playtour/resource/${b.idresource}`)
@@ -566,7 +575,7 @@ const ResourcePicker = Vue.component('resource-picker', {
           <h4 class="font-weight-bold"> Avaible Bookings: {{ start }} - {{ end }} </h4>
         </div>
       </div>
-			<div class="container" style="margin-top: 80px;">
+			<div class="container mt-4">
 				<div class="card shadow-sm p-4 mb-5 rounded" v-for="category in Object.entries(filteredItems)" style="width: 100%">
 					<h4 class="font-weight-bold">{{ category[0] }}</h4>
 					<div v-if="category[1].length" class="scrolling-wrapper pt-3">
@@ -639,7 +648,7 @@ const ResourceDetails = Vue.component('resource-details', {
     <div class="card mb-3 pl-5 pr-5 bg-pattern" style="width: 100%;">
       <div class="row no-gutters" style="padding: 80px 0 0 20px;">
         <div class="col-md-4 pb-5">
-          <img :src="'http://api.opencaribbean.org/api/v1/media/download/' + resource.mainImage" class="card-img" alt="Image of resource"
+          <img :src="'https://api.opencaribbean.org/api/v1/media/download/' + resource.mainImage" class="card-img" alt="Image of resource"
           style="width: 90%; height: 100%;">
         </div>
         <div class="col-md-8 pb-5">
@@ -661,15 +670,15 @@ const ResourceDetails = Vue.component('resource-details', {
             <option v-for="bookable in bookables" :value="bookable">{{ new Date(bookable.dateStart).toUTCString() }} --> {{ new Date(bookable.dateEnd).toUTCString() }}</option>
           </select> 
         </div>
-        
-         <button @click="bookStay" class="btn btn-dark btn-size pl-5 mb-4 d-flex align-items-center" type="submit" data-dismiss="modal">Book</button>
+        <br>
+         <button @click="bookStay" style="display:block;" class="btn btn-dark btn-size pl-5 mb-4 d-flex align-items-center" type="submit" data-dismiss="modal">Book</button>
       </div>
     </div>
     <div class="container">
       <ul class="row list-inline">
         <li class="col-sm-4" v-for="photo in resource.images">
           <div class="card-body">
-            <img :src="'http://api.opencaribbean.org/api/v1/media/download/' + photo" alt="Additional Images of the resource" 
+            <img :src="'https://api.opencaribbean.org/api/v1/media/download/' + photo" alt="Additional Images of the resource" 
             class="img-fluid card-img-top">
           </div>
         </li>
@@ -690,30 +699,42 @@ const ResourceDetails = Vue.component('resource-details', {
   methods: {
     bookStay: function() {
       let select = document.querySelector("select");
-      if(localStorage.getItem('current_user') !== null){
-        let bookingForm = new FormData();
-        bookingForm.append("bookableId", this.resource.bookeableList[0].bookableId);
-        bookingForm.append("dateend", localStorage.endDate);
-        bookingForm.append("datestart", localStorage.startDate);
-        bookingForm.append("idapp", this.resource.appId);
-        bookingForm.append("idresource", this.resource.id);
-        bookingForm.append("iduser", localStorage.getItem('current_user'));
-        bookingForm.append("status", "CREATED");
+			let booked = [];
+			booked.push(this.resource);
+			if (localStorage.getItem('booked') != null) {
+				resourceArr = JSON.parse(localStorage.getItem('booked'));
+				resourceArr.push(this.resource);
+				localStorage.setItem('booked', JSON.stringify(resourceArr));
+			} else {
+				booked.push(this.resource);
+				localStorage.setItem('booked', JSON.stringify(booked));
+			}
 
 
-				fetch('https://api.opencaribbean.org/api/v1/booking/bookings', {
-						method: 'POST', 
-						body: bookingForm,
-						headers: {
-							'X-CSRFToken': token,
-							'content-type': 'application/json;charset=UTF-8',
-						},
-						credentials: 'same-origin'
-				})
-				.then(res => res.json())
-				.then(jsonResp => {
-						console.log(jsonResp);
-				});
+		if(localStorage.getItem('current_user') !== null){
+			let bookingForm = new FormData();
+			bookingForm.append("bookableId", this.resource.bookeableList[0].bookableId);
+			bookingForm.append("dateend", localStorage.endDate);
+			bookingForm.append("datestart", localStorage.startDate);
+			bookingForm.append("idapp", this.resource.appId);
+			bookingForm.append("idresource", this.resource.id);
+			bookingForm.append("iduser", localStorage.getItem('current_user'));
+			bookingForm.append("status", "CREATED");
+
+
+			fetch('https://api.opencaribbean.org/api/v1/booking/bookings', {
+					method: 'POST', 
+					body: bookingForm,
+					headers: {
+						'X-CSRFToken': token,
+						'content-type': 'application/json;charset=UTF-8',
+					},
+					credentials: 'same-origin'
+			})
+			.then(res => res.json())
+			.then(jsonResp => {
+					console.log(jsonResp);
+			});
         
       }else{
         if(select.length == 0){
@@ -723,11 +744,12 @@ const ResourceDetails = Vue.component('resource-details', {
         }
       }
     }
-  },
-  created: function(){
-    this.bookables = this.resource.bookeableList;
-    console.log(this.bookables);
-  }      
+  	},
+		created: function(){
+			this.bookables = this.resource.bookeableList;
+			console.log(this.bookables);
+		}      
+	}
 });
 
 const ExploreMapFooter = Vue.component('map-footer', {
@@ -873,7 +895,7 @@ const Explore = Vue.component('explore', {
           L.marker([resource._Location_latitude, resource._Location_longitude])
           .bindPopup(`
           <div style="width: 150px;">
-            <!-- <img src="api.opencaribbean.org/api/v1/media/download/${resource.Images}" class="card-img-top" alt="..."> -->
+            <!-- <img src="https://api.opencaribbean.org/api/v1/media/download/${resource.Images}" class="card-img-top" alt="..."> -->
             <div class="card-body p-0">
               <h5 class="card-title">${resource.Name}</h5>
               <p class="card-text">${resource.Description}</p>
