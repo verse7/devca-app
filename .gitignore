@@ -15,3 +15,4 @@ venv/
 app/static/uploads/
 
 .vscode/
+node_modules/
