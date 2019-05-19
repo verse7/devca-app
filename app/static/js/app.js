@@ -220,10 +220,6 @@ const Register = Vue.component('register', {
           <label class="font-weight-bold">Password</label>
           <input type="password" name="password" class="form-control">
         </div>
-        <div class="form-group pb-3">
-          <label class="font-weight-bold">Photo</label>
-          <input type="file" name="photo" class="form-control-file">
-        </div>
         <input type="submit" name="register" value="Submit" class="btn btn-primary btn-block font-weight-bold">
       </form>
     </div>
