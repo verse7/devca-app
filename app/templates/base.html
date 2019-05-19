@@ -15,6 +15,7 @@
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Lato|Righteous" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/animate.css@3.5.1" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
     {% block css %} {% endblock%}
   </head>
@@ -32,6 +33,7 @@
     <script src="https://unpkg.com/ionicons@4.5.5/dist/ionicons.js"></script>
     <script>const token = "{{ csrf_token() }}";</script>
     <script src="{{ url_for('static', filename='js/jwt-decode.js') }}"></script>
+    <script src="{{url_for('static', filename='js/moment.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     {% block js %} {% endblock%}
   </body>
