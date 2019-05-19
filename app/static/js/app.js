@@ -57,7 +57,7 @@ Vue.component('app-footer', {
 Vue.component('resource-card', {
 	template: `
 	<div>
-		<div class="card mr-2 bg-transparent text-dark" > 
+		<div class="card mr-4 bg-transparent text-dark" > 
 			<img class="card-img img-fluid"
 					:src="'http://api.opencaribbean.org/api/v1/media/download/' + resource.mainImage">
 			<small class="mt-1 font-weight-bold">{{ resource.name }}</small>
@@ -306,8 +306,11 @@ const Search = Vue.component('search', {
       })
       .then(function (jsonResponse) {
         console.log(jsonResponse);
-				//filter responses here to find resources with accommodations
-				router.push({name:"results", params:{resources: jsonResponse.content}});
+				
+        //router.push({name:"results", params:{resources: jsonResponse.content}});
+        
+        localStorage.setItem('resources', JSON.stringify(jsonResponse.content));
+        router.push("/results");
       })
       .catch(function (error) {
         console.log(error);
@@ -405,10 +408,16 @@ const Calendar = Vue.component('calendar' , {
 
 const ResourcePicker = Vue.component('resource-picker', {
 	template: `
-		<div>
-			<div class="pl-5 pr-5" style="margin-top: 80px;">
-				<div class="p-4" v-for="category in Object.entries(filteredItems)">
-					<h4>{{ category[0] }}</h4>
+    <div>
+      <div class="bg-pattern">
+        <div style="padding: 80px 0 30px 80px;">
+          <p class="font-weight-bold"> Search Results Below </p>
+          <h4 class="font-weight-bold"> Avaible Bookings: {{ start }} - {{ end }} </h4>
+        </div>
+      </div>
+			<div class="container" style="margin-top: 80px;">
+				<div class="card shadow-sm p-4 mb-5 rounded" v-for="category in Object.entries(filteredItems)" style="width: 100%">
+					<h4 class="font-weight-bold">{{ category[0] }}</h4>
 					<div v-if="category[1].length" class="scrolling-wrapper pt-3">
 						<a v-for="resource in category[1]" data-toggle="modal" href="#myModal" @click="select(resource, $event)">
 							<resource-card :resource="resource" :key="resource.id" v-on:click="select(resource)"></resource-card>
@@ -437,12 +446,14 @@ const ResourcePicker = Vue.component('resource-picker', {
 			</div>
 		</div>
   `,
-  props: ['type', 'resources'],
   data: function(){
     return {
       filteredItems: {Accommodation: [], Attraction: [], Service: [], Tour: [], Event: [], Transportation_Operators: []},
 			empty: false,
-			selectedResource: null
+      selectedResource: null,
+      start: '',
+      end: '',
+      months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     }
   },
   methods: {
@@ -455,12 +466,19 @@ const ResourcePicker = Vue.component('resource-picker', {
 		}
   },
   created: function(){
-		let self = this;	
-		self.resources.forEach(element => {
+    let self = this;
+    let resources = JSON.parse(localStorage.getItem('resources'));	
+		resources.forEach(element => {
 			if(self.filteredItems[element['__type']] != null){
 				self.filteredItems[element['__type']].push(element)
 			}
-		});
+    });
+    let s = (localStorage.getItem('startDate')).split(/\D+/);
+    let e = (localStorage.getItem('endDate')).split(/\D+/);
+    s = new Date(Date.UTC(s[0], --s[1], s[2], s[3], s[4], s[5], s[6]));
+    e = new Date(Date.UTC(e[0], --e[1], e[2], e[3], e[4], e[5], e[6]));
+    this.start = self.months[s.getMonth()]+" "+(s.getDate()+1)+", "+s.getFullYear();
+    this.end = self.months[e.getMonth()]+" "+(e.getDate()+1)+", "+e.getFullYear();
   }
 })
 
@@ -536,7 +554,7 @@ const router = new VueRouter({
         {path: "/calendar", component: Calendar},
         {path: "/login", name: "login", component: Login, props: true},
         {path: "/register", name: "register", component: Register, props: true},
-        {path: "/results", name: "results", component: ResourcePicker, props: true},
+        {path: "/results", component: ResourcePicker},
         {path: "/details", name: "details", component: ResourceDetails, props: true},
         // This is a catch all route in case none of the above matches
         {path: "*", component: NotFound}
