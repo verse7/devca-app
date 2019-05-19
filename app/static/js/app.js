@@ -20,7 +20,7 @@ Vue.component('app-header', {
             <router-link class="nav-link" to="/calendar">Calendar</router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/itenerary">Itinerary</router-link>
+            <router-link class="nav-link" to="/itinerary">Itinerary</router-link>
           </li>
         </ul>
       </div>
@@ -116,13 +116,14 @@ Vue.component('default-listing', {
 const Home = Vue.component('home', {
     template: `
     <div>
-      <div class="bg-pattern mb-4">
-        <search></search>
-      </div>
-      <div class="container">
-        <resource-picker 
-      </div>
-    </div>
+			<div class="bg-pattern mb-4">
+				<search></search>
+			</div>
+			<div class="container">
+				<default-listing title="Hotels" type="HOTEL"></default-listing>
+				<default-listing title="Vill" type="MOTEL"></default-listing>
+			</div>
+		</div>
     `,
     data: function(){
       return {
@@ -339,10 +340,12 @@ const NotFound = Vue.component('not-found', {
 
 const Itinerary = Vue.component('itinerary', {
 	template:`
+	<div>
 		<h2 class="mb-2">My Itinerary</h2>
 		<ul class="list-group" v-if="bookings.length">
 			<li v-for="booking in bookings" class="list-group-item">{{booking.idresource}}</li>
 		</ul>
+	</div>
 	`,
 	data: function() {
 		bookings: []
