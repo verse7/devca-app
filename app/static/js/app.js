@@ -736,17 +736,16 @@ const ResourceDetails = Vue.component('resource-details', {
 					console.log(jsonResp);
 			});
         
-      }else{
-        alert("Must select a booking time from list before booking " + this.resource.type);
-        router.push('login');
-      }
+		}else{
+			alert("Must select a booking time from list before booking " + this.resource.type);
+			router.push('login');
+		}
     }
-  	},
-		created: function(){
-			this.bookables = this.resource.bookeableList;
-			console.log(this.bookables);
-		}      
-	}
+	},
+	created: function(){
+		this.bookables = this.resource.bookeableList;
+		console.log(this.bookables);
+	}      
 });
 
 const ExploreMapFooter = Vue.component('map-footer', {
