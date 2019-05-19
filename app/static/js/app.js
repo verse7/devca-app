@@ -566,7 +566,7 @@ const ResourcePicker = Vue.component('resource-picker', {
           <h4 class="font-weight-bold"> Avaible Bookings: {{ start }} - {{ end }} </h4>
         </div>
       </div>
-			<div class="container" style="margin-top: 80px;">
+			<div class="container mt-4">
 				<div class="card shadow-sm p-4 mb-5 rounded" v-for="category in Object.entries(filteredItems)" style="width: 100%">
 					<h4 class="font-weight-bold">{{ category[0] }}</h4>
 					<div v-if="category[1].length" class="scrolling-wrapper pt-3">
