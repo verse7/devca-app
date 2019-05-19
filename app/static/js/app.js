@@ -327,7 +327,6 @@ const NotFound = Vue.component('not-found', {
     }
 })
 
-<<<<<<< HEAD
 const Calendar = Vue.component('calendar' , {
   template: `
   <div class="calendar">
@@ -403,7 +402,6 @@ const Calendar = Vue.component('calendar' , {
     }
   }
 })
-=======
 const ResourcePicker = Vue.component('resource-picker', {
 	template: `
 		<div>
@@ -529,7 +527,6 @@ const ResourceDetails = Vue.component('resource-details', {
     }
   }
 });
->>>>>>> c47a54c5b9bd416993d484acba79ff6b7970cb74
 
 const router = new VueRouter({
     mode: 'history',
