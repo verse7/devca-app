@@ -27,10 +27,14 @@ const store = new Vuex.Store({
 
 Vue.component('app-header', {
     template: `
-    <nav class="navbar navbar-expand-md navbar-light bg-transparent fixed-top">
+    <nav id="mainNav" class="navbar navbar-expand-md navbar-light bg-transparent fixed-top">
       <router-link class="navbar-brand title-font" to="/">DevCa</router-link>
     
-      <div class="collapse navbar-collapse d-sm-none d-md-block">
+      <button @click="extendNav" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item active">
             <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
@@ -62,7 +66,18 @@ Vue.component('app-header', {
     },
     data: function(){
       return {
-        logged: false
+        logged: false,
+        isCollapsed: true
+      }
+    },
+    methods: {
+      extendNav: function() {
+        const nav = document.getElementById('mainNav');
+
+        this.isCollapsed = !this.isCollapsed;
+
+        nav.classList.toggle('bg-transparent');
+        nav.classList.toggle('bg-white');
       }
     }
 });
