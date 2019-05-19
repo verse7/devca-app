@@ -154,7 +154,7 @@ const Register = Vue.component('register', {
           <label class="font-weight-bold">Photo</label>
           <input type="file" name="photo" class="form-control-file">
         </div>
-        <input type="submit" name="register" value="Submit" class="btn btn-primary btn-block mb-3">
+        <input type="submit" name="register" value="Submit" class="btn btn-primary btn-block font-weight-bold">
       </form>
     </div>
   </div>
@@ -191,18 +191,24 @@ const Register = Vue.component('register', {
 const Login = Vue.component('login', {
   template: `
   <div>
-    <h4 class="font-weight-bold">Login</h4>
-    <form id="loginForm" method="post" @submit.prevent="login">
-      <div class="form-group">
-        <label class="font-weight-bold">Email</label>
-        <input type="email" class="form-control" name="email" placeholder="johndoe@test.com">
+    <div class="d-flex justify-content-center bg-pattern" style="padding-top: 80px;">
+      <div class="d-flex justify-content-start pb-3" style="width: 75%">
+        <h4 class="font-weight-bold">Login</h4>
       </div>
-      <div class="form-group">
-        <label class="font-weight-bold">Password</label>
-        <input type="password" class="form-control" name="password">
-      </div>
-      <input type="submit" value="Login" class="btn btn-primary font-weight-bold">
-    </form>
+    </div>
+    <div class="container pl-5 mt-5">
+      <form class="col-md-5" id="registerForm" id="loginForm" method="post" @submit.prevent="login">
+        <div class="form-group">
+          <label class="font-weight-bold">Email</label>
+          <input type="email" class="form-control" name="email" placeholder="johndoe@test.com">
+        </div>
+        <div class="form-group">
+          <label class="font-weight-bold">Password</label>
+          <input type="password" class="form-control" name="password">
+        </div>
+        <input type="submit" value="Login" class="btn btn-primary btn-block font-weight-bold">
+      </form>
+    </div>
   </div>
   `,
   methods: {
