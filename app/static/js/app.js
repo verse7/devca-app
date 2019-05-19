@@ -19,6 +19,9 @@ Vue.component('app-header', {
           <li class="nav-item">
             <router-link class="nav-link" to="/calendar">Calendar</router-link>
           </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/itenerary">Itinerary</router-link>
+          </li>
         </ul>
       </div>
     </nav>
@@ -45,7 +48,7 @@ Vue.component('app-footer', {
           </router-link>
         </li>
         <li>
-          <router-link to="/profile">
+          <router-link to="/itinerary">
             <ion-icon class="text-dark tab-icon" name="person"></ion-icon>
           </router-link>
         </li>
@@ -327,13 +330,43 @@ const NotFound = Vue.component('not-found', {
     }
 })
 
+const Itinerary = Vue.component('itinerary', {
+	template:`
+		<h2 class="mb-2">My Itinerary</h2>
+		<ul class="list-group" v-if="bookings.length">
+			<li v-for="booking in bookings" class="list-group-item">{{booking.idresource}}</li>
+		</ul>
+
+	`,
+	data: function() {
+		bookings: []
+	},
+	methods: {
+
+	},
+	created: function(){
+			fetch('http://api.opencaribbean.org/api/v1/booking/bookings/history?iduser=' + localStorage.current_user)
+			.then( resp => resp.json()).then(jsonResp => {
+				this.bookings = jsonResp.content;
+			});
+
+			// this.bookings.forEach(b => {
+			// 	fetch(`http://api.opencaribbean.org/api/v1/playtour/resource/${b.idresource}`)
+			// 	.then( resp => resp.json()).then(jsonResp => {
+			// 		console.log(`supposed resources ${jsonResp.content}`);
+			// 		b.name = jsonResp.content.name;
+			// 	});
+			// }) ;
+	}
+});
+
 const Calendar = Vue.component('calendar' , {
   template: `
   <div class="calendar">
     <div class="month">
       <ul>
-        <li class="prev"><ion-icon name="arrow-dropleft"></ion-icon></li>
-        <li class="next"><ion-icon name="arrow-dropright"></ion-icon></li>
+        <li class="prev"><ion-icon name="arrow-dropleft" @click="subtractMonth"></ion-icon></li>
+        <li class="next"><ion-icon name="arrow-dropright" @click="addMonth"></ion-icon></li>
         <li>{{ month }}<br><span style="font-size:18px">{{year}}</span></li>
       </ul>
     </div>
@@ -517,9 +550,13 @@ const ResourceDetails = Vue.component('resource-details', {
 
       fetch('https://api.opencaribbean.org/api/v1/booking/bookings', {
           method: 'POST', 
-          body: bookingForm,
+					body: bookingForm,
+					headers: {
+						'X-CSRFToken': token,
+						'content-type': 'application/json;charset=UTF-8',
+          },
           credentials: 'same-origin'
-      })
+      })-
       .then(res => res.json())
       .then(jsonResp => {
           console.log(jsonResp);
@@ -536,7 +573,8 @@ const router = new VueRouter({
         {path: "/login", name: "login", component: Login, props: true},
         {path: "/register", name: "register", component: Register, props: true},
         {path: "/results", name: "results", component: ResourcePicker, props: true},
-        {path: "/details", name: "details", component: ResourceDetails, props: true},
+				{path: "/details", name: "details", component: ResourceDetails, props: true},
+				{path: "/itinerary", name:"itinerary", component: Itinerary, props: true},
         // This is a catch all route in case none of the above matches
         {path: "*", component: NotFound}
     ]
