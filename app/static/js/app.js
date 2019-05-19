@@ -1,5 +1,30 @@
 Vue.config.ignoredElements = ['ion-icon'];
 
+const store = new Vuex.Store({
+  state: {
+    resources: []
+  },
+  getters: {
+    resources: (state) => {
+      return state.resources;
+    },
+    typeResources: (state) => (type) => {
+      if (type === 'More') {
+        return state.resources.filter(
+          resource => resource.Location_Type !== 'Accomodation' &&
+                      resource.Location_Type !== 'Attraction' &&
+                      resource.Location_Type !== 'Services');
+      }
+      return state.resources.filter(resource => resource.Location_Type === type);
+    }
+  },
+  mutations: {
+    updateResources: (state, resources) => {
+      state.resources = resources;
+    }
+  }
+});
+
 Vue.component('app-header', {
     template: `
     <nav class="navbar navbar-expand-md navbar-light bg-transparent fixed-top">
@@ -9,6 +34,9 @@ Vue.component('app-header', {
         <ul class="navbar-nav ml-auto">
           <li class="nav-item active">
             <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/explore">Explore</router-link>
           </li>
           <li class="nav-item" v-if="!logged">
             <router-link class="nav-link" to="/register">Register</router-link>
@@ -90,7 +118,6 @@ Vue.component('resource-card', {
     }
   }
 });
-
 
 Vue.component('default-listing', {
   template: `
@@ -687,6 +714,163 @@ const ResourceDetails = Vue.component('resource-details', {
   }      
 });
 
+const ExploreMapFooter = Vue.component('map-footer', {
+  template: `
+  <footer id="navCentre"
+    class="fixed-bottom bg-white rounded-top-xtra 
+          shadow-sm nav-centre d-flex flex-column 
+          align-items-center">
+    <div @click="extendNavCentre" class="clickable notch mt-2"></div>
+    <div class="container pt-3 pl-3 pr-3 d-flex flex-row justify-content-between align-items-center overflow-x-scroll">
+        <category-icon title="Stays" type="Accomodation" icon="business"></category-icon>
+        <category-icon title="Attractions" type="Attraction" icon="paper"></category-icon>
+        <category-icon title="Services" type="Services" icon="build"></category-icon>
+        <category-icon title="More" type="More" icon="code-working"></category-icon>
+    </div>
+  </footer>
+  `,
+  data: function() {
+    return {
+      isExtended: false,
+    }
+  },
+  methods: {
+    extendNavCentre: function() {
+      this.isExtended = !this.isExtended;
+
+      const nv = document.getElementById('navCentre');
+
+      nv.style.height = this.isExtended ? '300px' : '100px';
+    }
+  }
+});
+
+const CategoryIcon = Vue.component('category-icon', {
+  template: `
+    <div @click="filterResources" class="clickable d-flex flex-column justify-content-center align-items-center">
+      <div style="background-color: #007bff;"
+        class="shadow-sm rounded-circle type-icon d-flex justify-content-center align-items-center text-white">
+        <ion-icon :name="icon"></ion-icon>
+      </div>
+      <small class="text-muted">{{ title }}</small>
+    </div>
+  `,
+  props: ['title', 'type', 'icon'],
+  methods: {
+    filterResources: function() {
+      const results = this.$store.getters.typeResources(this.type);
+      this.$emit('filter-resources', results);
+      console.log(results);
+    }
+  }
+});
+
+const ExploreMapHeader = Vue.component('map-header', {
+  template: `
+  <nav class="navbar navbar-expand-lg navbar-light bg-transparent fixed-top">
+    <div class="input-group shadow-sm text-small">
+    <div class="input-group-prepend">
+      <router-link to="/" class="btn btn-primary d-flex justify-content-center align-items-center">
+        <ion-icon name="arrow-round-back"></ion-icon>
+      </router-link>
+    </div>
+      <input type="text" v-model="searchTerm"
+        class="form-control text-small" placeholder="Search Treasure Beach...">
+      <div class="input-group-append">
+        <button @click="searchResources" class="btn btn-primary text-center d-flex justify-content-center align-items-center" type="button">
+          <ion-icon name="search"></ion-icon>
+        </button>
+        <button @click="getDirections" class="btn btn-info text-center d-flex justify-content-center align-items-center" type="button">
+          <ion-icon name="compass"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </nav>
+  `,
+  data: function() {
+    return {
+      searchTerm: ''
+    }
+  },
+  methods: {
+    searchResources: function() {
+      console.log(this.searchTerm);
+    },
+    getDirections: function() {
+      console.log(this.searchTerm);
+    }
+  }
+});
+
+const Explore = Vue.component('explore', {
+    template: `
+    <div>
+        <map-header></map-header>
+        <div id="map" v-on:filter-resources="updateMarkers"></div>
+        <map-footer></map-footer>
+    </div>
+    `,
+    data: function() {
+      return {
+        accessToken: 'pk.eyJ1IjoiemRtd2kiLCJhIjoiY2l6a3EyOW1wMDAzbjJ3cHB2aHQ5a2N1eCJ9.xOIXUuzA4pJt7cLIR-wUSg',
+        lat: 17.8871132,
+        lng: -77.7639855,
+        zoom: 14,
+        map: null,
+      }
+    },
+    methods: {
+      updateResources : function(resources) {
+        this.$store.commit('updateResources', resources);
+      },
+
+      updateMarkers: function(resources) {
+        let self = this;
+      }
+    },
+    mounted: function() {
+      let self = this;
+
+      self.map = L.map('map', {
+        zoomControl: false
+      }).setView([this.lat, this.lng], this.zoom);
+  
+      L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y}?access_token='+ this.accessToken, {
+          attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+          maxZoom: 18,
+          id: 'mapbox.streets',
+          accessToken: this.accessToken
+      }).addTo(self.map);
+
+      fetch('/api/resources', {
+        method: 'GET'
+      })
+      .then(res => {
+        return res.json()
+      })
+      .then(data => {
+        self.updateResources(data);
+
+        console.log(data);
+
+        self.$store.getters.resources.forEach(resource => {
+          L.marker([resource._Location_latitude, resource._Location_longitude])
+          .bindPopup(`
+          <div style="width: 150px;">
+            <!-- <img src="api.opencaribbean.org/api/v1/media/download/${resource.Images}" class="card-img-top" alt="..."> -->
+            <div class="card-body p-0">
+              <h5 class="card-title">${resource.Name}</h5>
+              <p class="card-text">${resource.Description}</p>
+            </div>
+          </div>
+          `)
+          .openPopup()
+          .addTo(self.map);
+        })
+      });
+    }
+});
+
 const router = new VueRouter({
     mode: 'history',
     routes: [
@@ -697,7 +881,8 @@ const router = new VueRouter({
         {path: "/register", name: "register", component: Register, props: true},
         {path: "/results", name: "results", component: ResourcePicker, props: true},
 				{path: "/details", name: "details", component: ResourceDetails, props: true},
-				{path: "/itinerary", name:"itinerary", component: Itinerary},
+        {path: "/itinerary", name:"itinerary", component: Itinerary},
+        {path: "/explore", name: "explore", component: Explore},
         // This is a catch all route in case none of the above matches
         {path: "*", component: NotFound}
     ]
@@ -705,5 +890,7 @@ const router = new VueRouter({
 
 let app = new Vue({
     el: "#app",
-    router
+    router,
+    store,
+    components: {Explore, CategoryIcon, ExploreMapHeader, ExploreMapFooter}
 });
