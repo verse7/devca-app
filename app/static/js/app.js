@@ -401,7 +401,8 @@ const Calendar = Vue.component('calendar' , {
         t.dateContext = moment(t.dateContext).subtract(1, 'month');
     }
   }
-})
+});
+
 const ResourcePicker = Vue.component('resource-picker', {
 	template: `
 		<div>
