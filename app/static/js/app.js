@@ -693,6 +693,12 @@ const ResourceDetails = Vue.component('resource-details', {
       let booked = [];
       booked.push(this.resource);
 
+      if (localStorage.getItem('booked') != null) {
+        resourceArr = JSON.parse(localStorage.getItem('booked'));
+        resourceArr.push(this.resource);
+        localStorage.setItem('booked', JSON.stringify(booked));
+      }
+
       if(localStorage.getItem('current_user') !== null){
         let bookingForm = new FormData();
         bookingForm.append("bookableId", this.resource.bookeableList[0].bookableId);
