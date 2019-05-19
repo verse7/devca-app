@@ -120,11 +120,18 @@ const Home = Vue.component('home', {
         <search></search>
       </div>
       <div class="container">
-        <default-listing title="Hotels" type="HOTEL"></default-listing>
-        <default-listing title="Vill" type="MOTEL"></default-listing>
+        <resource-picker 
       </div>
     </div>
-    `
+    `,
+    data: function(){
+      return {
+        resources: []
+      }
+    },
+    created: function(){
+
+    }
 });
 
 const Register = Vue.component('register', {
@@ -434,6 +441,7 @@ const Calendar = Vue.component('calendar' , {
     }
   }
 })
+
 const ResourcePicker = Vue.component('resource-picker', {
 	template: `
 		<div>
@@ -515,8 +523,17 @@ const ResourceDetails = Vue.component('resource-details', {
           </div>
         </div>
         <p class="card-text">{{ resource.description }}</p>
-         <h4 class="font-weight-bold pr-5 pb-4">Select {{ resource.__type }}: </h4>
+
+        <!-- BOOKING LIST HERE -->
+        <div class="form">
+          <label for="book-sel">Select Booking Period: </label>
+          <select class="form-control" id="book-sel" v-model="selBooking">
+            <option v-for="bookable in bookables" :value="bookable">{{ new Date(bookable.dateStart).toUTCString() }} --> {{ new Date(bookable.dateEnd).toUTCString() }}</option>
+          </select> 
+        </div>
+        
          <button @click="bookStay" class="btn btn-dark btn-size pl-5 mb-4 d-flex align-items-center" type="submit">Book</button>
+         Selected value is : {{ selBooking }}
       </div>
     </div>
     <div class="container">
@@ -535,33 +552,48 @@ const ResourceDetails = Vue.component('resource-details', {
   created: function(){
     console.log(this.resource);
   },
+  data: function(){
+    return{
+      bookables: [],
+      selBooking: null
+    }
+  },
   methods: {
     bookStay: function() {
-      let bookingForm = new FormData();
-      bookingForm.append("bookableId", this.resource.bookeableList[0].bookableId);
-      bookingForm.append("dateend", localStorage.endDate);
-      bookingForm.append("datestart", localStorage.startDate);
-      bookingForm.append("idapp", this.resource.appId);
-      bookingForm.append("idresource", this.resource.id);
-      bookingForm.append("iduser", localStorage.getItem('current_user'));
-      bookingForm.append("status", "CREATED");
+      if(this.selBooking != null){
+        let bookingForm = new FormData();
+        bookingForm.append("bookableId", this.selBooking.bookableId);
+        bookingForm.append("dateend", localStorage.endDate);
+        bookingForm.append("datestart", localStorage.startDate);
+        bookingForm.append("idapp", this.resource.appId);
+        bookingForm.append("idresource", this.resource.id);
+        bookingForm.append("iduser", localStorage.getItem('current_user'));
+        bookingForm.append("status", "CREATED");
 
 
-      fetch('https://api.opencaribbean.org/api/v1/booking/bookings', {
-          method: 'POST', 
-					body: bookingForm,
-					headers: {
-						'X-CSRFToken': token,
-						'content-type': 'application/json;charset=UTF-8',
-          },
-          credentials: 'same-origin'
-      })
-      .then(res => res.json())
-      .then(jsonResp => {
-          console.log(jsonResp);
-      });
+				fetch('https://api.opencaribbean.org/api/v1/booking/bookings', {
+						method: 'POST', 
+						body: bookingForm,
+						headers: {
+							'X-CSRFToken': token,
+							'content-type': 'application/json;charset=UTF-8',
+						},
+						credentials: 'same-origin'
+				})
+				.then(res => res.json())
+				.then(jsonResp => {
+						console.log(jsonResp);
+				});
+        
+      }else{
+        alert("Must select a booking time from list before booking " + this.resource.type);
+      }
     }
-  }
+  },
+  created: function(){
+    this.bookables = this.resource.bookeableList;
+    console.log(this.bookables);
+  }      
 });
 
 const router = new VueRouter({
