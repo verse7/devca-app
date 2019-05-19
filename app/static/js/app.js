@@ -670,7 +670,7 @@ const ResourceDetails = Vue.component('resource-details', {
             <option v-for="bookable in bookables" :value="bookable">{{ new Date(bookable.dateStart).toUTCString() }} --> {{ new Date(bookable.dateEnd).toUTCString() }}</option>
           </select> 
         </div>
-        
+        <br>
          <button @click="bookStay" class="btn btn-dark btn-size pl-5 mb-4 d-flex align-items-center" type="submit" data-dismiss="modal">Book</button>
       </div>
     </div>
