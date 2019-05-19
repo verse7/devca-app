@@ -199,3 +199,7 @@ li {
     border-radius: 15px;
     background-color: rgba(0, 0, 0, 0.15)
 }
+
+#mainNav {
+    transition: all 0.2s ease-in-out;
+}
